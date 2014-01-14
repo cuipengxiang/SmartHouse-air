@@ -5,36 +5,36 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>7CDD9F68-9448-4B52-B7DB-8DEE556EDFB0</string>
+	<string>AE33F39E-04C4-4E58-90A6-0046DB8C2144</string>
 	<key>IDESourceControlProjectName</key>
 	<string>SmartHouse</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>D9FB7538-CFDE-41E8-9C71-8A46870D3FB4</key>
-		<string>https://github.com/cuipengxiang/SmartHouse.git</string>
+		<key>29763A52-D86B-4D9C-A658-DD41E54958BC</key>
+		<string>https://github.com/cuipengxiang/SmartHouse-air.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>SmartHouse.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>D9FB7538-CFDE-41E8-9C71-8A46870D3FB4</key>
+		<key>29763A52-D86B-4D9C-A658-DD41E54958BC</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/cuipengxiang/SmartHouse.git</string>
+	<string>https://github.com/cuipengxiang/SmartHouse-air.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>D9FB7538-CFDE-41E8-9C71-8A46870D3FB4</string>
+	<string>29763A52-D86B-4D9C-A658-DD41E54958BC</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>D9FB7538-CFDE-41E8-9C71-8A46870D3FB4</string>
+			<string>29763A52-D86B-4D9C-A658-DD41E54958BC</string>
 			<key>IDESourceControlWCCName</key>
-			<string>SmartHouse</string>
+			<string>SmartHouse-air</string>
 		</dict>
 	</array>
 </dict>
