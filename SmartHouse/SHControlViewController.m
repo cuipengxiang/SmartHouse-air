@@ -17,6 +17,7 @@
 #define TYPE_LIGHT 0
 #define TYPE_CURTAIN 1
 #define TYPE_MUSIC 2
+#define TYPE_AIR 3
 
 @interface SHControlViewController ()
 
@@ -30,7 +31,6 @@
     if (self) {
         self.myAppDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
-        
         self.socketQueue = dispatch_queue_create("socketQueue1", NULL);
     }
     return self;
@@ -42,8 +42,6 @@
     [super viewDidLoad];
     self.needquery = YES;
     
-    self.modeView = [[UIView alloc] init];
-    self.scrollView = [[UIScrollView alloc] init];
     self.detailView = [[UIScrollView alloc] init];
     self.detailBackground = [[UIImageView alloc] init];
     
@@ -62,6 +60,11 @@
     [self.MusicButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateSelected];
     [self.MusicButton addTarget:self action:@selector(onMusicClick:) forControlEvents:UIControlEventTouchUpInside];
     
+    self.AirButton = [[UIButton alloc] init];
+    [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateNormal];
+    [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateSelected];
+    [self.AirButton addTarget:self action:@selector(onAirClick:) forControlEvents:UIControlEventTouchUpInside];
+    
     self.currentModel = [self.myAppDelegate.models objectAtIndex:0];
     self.tableView = [[UITableView alloc] init];
     [self.tableView setBackgroundView:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"left_background"]]];
@@ -72,40 +75,28 @@
     [self.tableView reloadData];
     [self.view addSubview:self.tableView];
     
-    self.scrollLeft = [[UIButton alloc] init];
-    self.scrollRight = [[UIButton alloc] init];
     self.GuidePanel = [[UIView alloc] init];
     [self.GuidePanel setBackgroundColor:[UIColor clearColor]];
     
     if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
         [self setupNavigationBar:1024.0f];
         [self.tableView setFrame:CGRectMake(0.0f, 44.0f, 140.0f, 704.0f)];
-        [self.LightButton setFrame:CGRectMake(192.0f, 258.0f, 66.0f, 70.0f)];
-        [self.CurtainButton setFrame:CGRectMake(292.0f, 258.0f, 66.0f, 70.0f)];
-        [self.MusicButton setFrame:CGRectMake(392.0f, 258.0f, 66.0f, 70.0f)];
-        [self.modeView setFrame:CGRectMake(160.0f, 64.0f, 844.0f, 156.0f)];
-        [self.modeView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_mode_l"]]];
-        [self.scrollView setFrame:CGRectMake(54.0f, 30.0f, 736.0f, 100.0f)];
-        [self.scrollLeft setFrame:CGRectMake(20.0f, 55.0f, 25.0f, 50.0f)];
-        [self.scrollRight setFrame:CGRectMake(self.modeView.frame.size.width - 45.0f, 55.0f, 25.0f, 50.0f)];
-        self.countInOnePage = 4;
-        [self.detailBackground setFrame:CGRectMake(160.0f, 344.0f, 844.0f, 384.0f)];
-        [self.detailView setFrame:CGRectMake(160.0f, 344.0f, 844.0f, 384.0f)];
+        [self.LightButton setFrame:CGRectMake(192.0f, 90.0f, 66.0f, 70.0f)];
+        [self.CurtainButton setFrame:CGRectMake(292.0f, 90.0f, 66.0f, 70.0f)];
+        [self.MusicButton setFrame:CGRectMake(392.0f, 90.0f, 66.0f, 70.0f)];
+        [self.AirButton setFrame:CGRectMake(492.0f, 90.0f, 66.0f, 70.0f)];
+        [self.detailBackground setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
+        [self.detailView setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
         [self.detailView setPagingEnabled:YES];
     } else {
         [self setupNavigationBar:768.0f];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 960)];
-        [self.LightButton setFrame:CGRectMake(190.0f, 248.0f, 72.0f, 76.0f)];
-        [self.CurtainButton setFrame:CGRectMake(288.0f, 248.0f, 72.0f, 76.0f)];
-        [self.MusicButton setFrame:CGRectMake(386.0f, 248.0f, 72.0f, 76.0f)];
-        [self.modeView setFrame:CGRectMake(160.0f, 64.0f, 588.0f, 156.0f)];
-        [self.modeView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_mode_p"]]];
-        [self.scrollView setFrame:CGRectMake(110.0f, 30.0f, 368.0f, 100.0f)];
-        [self.scrollLeft setFrame:CGRectMake(50.0f, 55.0f, 25.0f, 50.0f)];
-        [self.scrollRight setFrame:CGRectMake(self.modeView.frame.size.width - 75.0f, 55.0f, 25.0f, 50.0f)];
-        self.countInOnePage = 2;
-        [self.detailBackground setFrame:CGRectMake(160.0f, 344.0f, 588.0f, 640.0f)];
-        [self.detailView setFrame:CGRectMake(160.0f, 384.0f, 588.0f, 600.0f)];
+        [self.LightButton setFrame:CGRectMake(190.0f, 95.0f, 72.0f, 76.0f)];
+        [self.CurtainButton setFrame:CGRectMake(288.0f, 95.0f, 72.0f, 76.0f)];
+        [self.MusicButton setFrame:CGRectMake(386.0f, 95.0f, 72.0f, 76.0f)];
+        [self.AirButton setFrame:CGRectMake(484.0f, 95.0f, 72.0f, 76.0f)];
+        [self.detailBackground setFrame:CGRectMake(160.0f, 186.0f, 588.0f, 640.0f)];
+        [self.detailView setFrame:CGRectMake(160.0f, 226.0f, 588.0f, 580.0f)];
         [self.detailView setPagingEnabled:NO];
     }
     [self.view setBackgroundColor:[UIColor colorWithRed:246.0/255.0f green:246.0/255.0f blue:246.0/255.0f alpha:1.0]];
@@ -113,26 +104,17 @@
     [self.view addSubview:self.LightButton];
     [self.view addSubview:self.CurtainButton];
     [self.view addSubview:self.MusicButton];
+    [self.view addSubview:self.AirButton];
     
-    [self.modeView addSubview:self.scrollLeft];
-    [self.modeView addSubview:self.scrollRight];
-    [self.modeView addSubview:self.scrollView];
-    
-    [self setupModeSelectBar:self.currentModel];
     [self setupDetailView:self.currentModel Type:TYPE_LIGHT];
     
-    [self.scrollLeft setBackgroundImage:[UIImage imageNamed:@"turn_left"] forState:UIControlStateNormal];
-    [self.scrollLeft setBackgroundImage:[UIImage imageNamed:@"turn_left"] forState:UIControlStateSelected];
-    [self.scrollLeft addTarget:self action:@selector(onScrollLeftClick:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [self.scrollRight setBackgroundImage:[UIImage imageNamed:@"turn_right"] forState:UIControlStateNormal];
-    [self.scrollRight setBackgroundImage:[UIImage imageNamed:@"turn_right"] forState:UIControlStateSelected];
-    [self.scrollRight addTarget:self action:@selector(onScrollRightClick:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [self.view addSubview:self.modeView];
     [self.view addSubview:self.detailBackground];
     [self.view addSubview:self.detailView];
     [self.view addSubview:self.GuidePanel];
+    
+    if (![self.myModeThread isExecuting]) {
+        [self.myModeThread start];
+    }
 }
 
 //设置导航栏
@@ -198,87 +180,6 @@
     }];
 }
 
-- (void)setupModeSelectBar:(SHRoomModel *)currentModel
-{
-    for (UIButton *button in self.scrollView.subviews) {
-        [button removeFromSuperview];
-    }
-    
-    if (![self.myModeThread isExecuting]) {
-        [self.myModeThread start];
-    }
-    
-    [self.scrollView setBounces:YES];
-    [self.scrollView setShowsHorizontalScrollIndicator:NO];
-    [self.scrollView setContentOffset:CGPointMake(0, 0)];
-    self.modeCurrentPage = 0;
-    [self.scrollView setPagingEnabled:YES];
-
-    if (self.currentModel.modesNames.count % self.countInOnePage == 0) {
-        self.modesCount = self.currentModel.modesNames.count / self.countInOnePage;
-    } else {
-        self.modesCount = self.currentModel.modesNames.count / self.countInOnePage + 1;
-    }
-    
-    [self.scrollView setContentSize:CGSizeMake(184*self.currentModel.modesNames.count, 100.0f)];
-    [self.scrollView setBackgroundColor:[UIColor clearColor]];
-    for (int i = 0; i < self.currentModel.modesNames.count; i++) {
-        UIButton *modeButton = [[UIButton alloc] initWithFrame:CGRectMake(20 + i*184, 22, 144, 56)];
-        [modeButton setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateNormal];
-        [modeButton setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateSelected];
-        [modeButton setTitleEdgeInsets:UIEdgeInsetsMake(0, 30, 0, 0)];
-        [modeButton setBackgroundImage:[UIImage imageNamed:@"mode_normal"] forState:UIControlStateNormal];
-        [modeButton setBackgroundImage:[UIImage imageNamed:@"mode_selected"] forState:UIControlStateSelected];
-        [modeButton setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
-        [modeButton setTitleColor:[UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1.0] forState:UIControlStateNormal];
-        [modeButton setTag:MODE_BTN_BASE_TAG + i];
-        [modeButton addTarget:self action:@selector(onModeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.scrollView addSubview:modeButton];
-    }
-    
-}
-
-- (void)onModeButtonClick:(UIButton *)button
-{
-    
-    for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count; i++) {
-        [(UIButton *)[self.modeView viewWithTag:i] setSelected:NO];
-    }
-    [button setSelected:YES];
-
-    self.skipQuery = 1;
-    NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", [self.currentModel.modesCmds objectAtIndex:button.tag - MODE_BTN_BASE_TAG]];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-        NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-        socket.command = commandSend;
-        [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
-    });
-}
-
-- (void)onScrollLeftClick:(id)sender
-{
-    self.modeCurrentPage = self.scrollView.contentOffset.x/184.0;
-    if (self.modeCurrentPage > 0) {
-        CGPoint point = CGPointMake((self.modeCurrentPage - 1) * 184.0, self.scrollView.contentOffset.y);
-        [self.scrollView setContentOffset:point animated:YES];
-    }
-}
-
-- (void)onScrollRightClick:(id)sender
-{
-    if ((int)self.scrollView.contentOffset.x % 184 != 0) {
-        self.modeCurrentPage = self.scrollView.contentOffset.x/184.0 + 1;
-    } else {
-        self.modeCurrentPage = self.scrollView.contentOffset.x/184.0;
-    }
-    int i = self.currentModel.modesNames.count;
-    if (self.modeCurrentPage < (i - self.countInOnePage)) {
-        CGPoint point = CGPointMake((self.modeCurrentPage + 1) * 184.0, self.scrollView.contentOffset.y);
-        [self.scrollView setContentOffset:point animated:YES];
-    }
-}
-
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type
 {
     self.currentType = type;
@@ -330,16 +231,26 @@
                 [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_music_p"]];
             }
             break;
+        case TYPE_AIR:
+            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.musicNames];
+            detailViewBtns = [[NSMutableArray alloc] initWithArray:self.currentModel.musicBtns];
+            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.musicCmds];
+            if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
+                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_air_l"]];
+            } else {
+                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_air_p"]];
+            }
+            break;
     }
     [self.GuidePanel setHidden:YES];
-    if (type != TYPE_MUSIC) {
+    if ((type == TYPE_LIGHT)||(type == TYPE_CURTAIN)) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-            int pageCount = detailViewNames.count/4;
-            if (detailViewNames.count%4 != 0) {
+            int pageCount = detailViewNames.count/6;
+            if (detailViewNames.count%6 != 0) {
                 pageCount++;
             }
             self.detailPageCount = pageCount;
-            [self.detailView setContentSize:CGSizeMake(844*pageCount, 384)];
+            [self.detailView setContentSize:CGSizeMake(844*pageCount, 553)];
             if (pageCount > 1) {
                 [self.GuidePanel setFrame:CGRectMake(160+(844-(pageCount*2-1)*15)/2.0, 684, (pageCount*2-1)*15, 44)];
                 for (int i = 0; i < pageCount; i++) {
@@ -355,12 +266,12 @@
                 [self.GuidePanel setHidden:NO];
             }
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(i/4*844 + 34.5 + (i%2)*395, 45 + i/2%2*155, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
+                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(i/6*844 + 34.5 + (i%2)*395, 45 + i/2%3*155, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
                 [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
                 [self.detailView addSubview:detailViewPanel];
             }
         } else {
-            int height = MAX(640, (150 * detailViewNames.count));
+            int height = MAX(580, (150 * detailViewNames.count));
             [self.detailView setContentSize:CGSizeMake(588, height)];
             for (int i = 0; i < detailViewNames.count; i++) {
                 SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(104, i*150, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
@@ -368,15 +279,14 @@
                 [self.detailView addSubview:detailViewPanel];
             }
         }
-    }
-    else {
+    } else if (type == TYPE_MUSIC){
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             int pageCount = detailViewNames.count/2;
             if (detailViewNames.count%2 != 0) {
                 pageCount++;
             }
             self.detailPageCount = pageCount;
-            [self.detailView setContentSize:CGSizeMake(844*pageCount, 384)];
+            [self.detailView setContentSize:CGSizeMake(844*pageCount, 553)];
             if (pageCount > 1) {
                 [self.GuidePanel setFrame:CGRectMake(160+(844-(pageCount*2-1)*15)/2.0, 684, (pageCount*2-1)*15, 44)];
                 for (int i = 0; i < pageCount; i++) {
@@ -397,7 +307,7 @@
                 [self.detailView addSubview:detailViewPanel];
             }
         } else {
-            int height = MAX(640, (300 * detailViewNames.count));
+            int height = MAX(580, (300 * detailViewNames.count));
             [self.detailView setContentSize:CGSizeMake(588, height)];
             for (int i = 0; i < detailViewNames.count; i++) {
                 SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(104, i*300, 380, 280) andTitle:[detailViewNames objectAtIndex:i] andController:self];
@@ -405,6 +315,43 @@
                 [self.detailView addSubview:detailViewPanel];
             }
         }
+    } else if (type == TYPE_AIR) {
+        if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
+            int pageCount = detailViewNames.count/2;
+            if (detailViewNames.count%2 != 0) {
+                pageCount++;
+            }
+            self.detailPageCount = pageCount;
+            [self.detailView setContentSize:CGSizeMake(844*pageCount, 553)];
+            if (pageCount > 1) {
+                [self.GuidePanel setFrame:CGRectMake(160+(844-(pageCount*2-1)*15)/2.0, 684, (pageCount*2-1)*15, 44)];
+                for (int i = 0; i < pageCount; i++) {
+                    UIImageView *image = [[UIImageView alloc] initWithFrame:CGRectMake(i*30, 14.5, 15, 15)];
+                    if (i == 0) {
+                        [image setImage:[UIImage imageNamed:@"selected"]];
+                    } else {
+                        [image setImage:[UIImage imageNamed:@"unselected"]];
+                    }
+                    [image setTag:GUIDE_PANEL_BASE_TAG + i];
+                    [self.GuidePanel addSubview:image];
+                }
+                [self.GuidePanel setHidden:NO];
+            }
+            for (int i = 0; i < detailViewNames.count; i++) {
+                SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(i/2*844 + 30 + (i%2)*404, 45, 380, 280)andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
+                [self.detailView addSubview:detailViewPanel];
+            }
+        } else {
+            int height = MAX(580, (300 * detailViewNames.count));
+            [self.detailView setContentSize:CGSizeMake(588, height)];
+            for (int i = 0; i < detailViewNames.count; i++) {
+                SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(104, i*300, 380, 280) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
+                [self.detailView addSubview:detailViewPanel];
+            }
+        }
+
     }
 
 }
@@ -424,9 +371,13 @@
     [self setupDetailView:self.currentModel Type:TYPE_MUSIC];
 }
 
+- (void)onAirClick:(id)sender
+{
+    [self setupDetailView:self.currentModel Type:TYPE_AIR];
+}
+
 -(void)updateViews:(SHRoomModel *)currentModel
 {
-    [self setupModeSelectBar:self.currentModel];
     [self setupDetailView:self.currentModel Type:0];
 }
 
@@ -500,49 +451,20 @@
     }
 }
 
-- (void)setCurrentMode:(NSString *)mode
-{
-    //跳过点击按钮后的第一次查询
-    if (self.skipQuery == 1) {
-        self.skipQuery = 0;
-        return;
-    }
-        
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        int btn_tag = -1;
-        for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count; i++) {
-            int location = [mode rangeOfString:[self.currentModel.modeBacks objectAtIndex:i - MODE_BTN_BASE_TAG]].location;
-            
-            if (location == INT32_MAX) {
-                //[(UIButton *)[self.modeView viewWithTag:i] setSelected:NO];
-            } else {
-                //[(UIButton *)[self.modeView viewWithTag:i] setSelected:YES];
-                btn_tag = i;
-            }
-        }
-        if (btn_tag > 0) {
-            for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count;i++) {
-                if (i == btn_tag) {
-                    [(UIButton *)[self.modeView viewWithTag:i] setSelected:YES];
-                } else {
-                    [(UIButton *)[self.modeView viewWithTag:i] setSelected:NO];
-                }
-            }
-        }
-    });
-}
-
 - (void)sendCommand:(NSString *)cmd;
 {
     [self.myAppDelegate sendCommand:cmd from:self];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
-    return YES;
+    if ((toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft)||(toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)) {
+        return YES;
+    }
+    return NO;
 }
 
 - (BOOL)shouldAutorotate{
-    return YES;
+    return NO;
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -550,43 +472,24 @@
     if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
         [self.navigationBar setFrame:CGRectMake(0, 0, 1024, 44)];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 704)];
-        [self.LightButton setFrame:CGRectMake(192.0f, 258.0f, 66.0f, 70.0f)];
-        [self.CurtainButton setFrame:CGRectMake(292.0f, 258.0f, 66.0f, 70.0f)];
-        [self.MusicButton setFrame:CGRectMake(392.0f, 258.0f, 66.0f, 70.0f)];
-        [self.modeView setFrame:CGRectMake(160.0f, 64.0f, 844.0f, 156.0f)];
-        [self.modeView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_mode_l"]]];
-        [self.scrollView setFrame:CGRectMake(54.0f, 30.0f, 736.0f, 100.0f)];
-        [self.scrollLeft setFrame:CGRectMake(20.0f, 55.0f, 25.0f, 50.0f)];
-        [self.scrollRight setFrame:CGRectMake(self.modeView.frame.size.width - 45.0f, 55.0f, 25.0f, 50.0f)];
-        self.countInOnePage = 4;
-        [self.detailView setFrame:CGRectMake(160.0f, 344.0f, 844.0f, 384.0f)];
+        [self.LightButton setFrame:CGRectMake(192.0f, 90.0f, 66.0f, 70.0f)];
+        [self.CurtainButton setFrame:CGRectMake(292.0f, 90.0f, 66.0f, 70.0f)];
+        [self.MusicButton setFrame:CGRectMake(392.0f, 90.0f, 66.0f, 70.0f)];
+        [self.detailView setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
         [self.detailView setPagingEnabled:YES];
-        [self.detailBackground setFrame:CGRectMake(160.0f, 344.0f, 844.0f, 384.0f)];
+        [self.detailBackground setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
     } else {
         [self.navigationBar setFrame:CGRectMake(0, 0, 768, 44)];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 960)];
-        [self.LightButton setFrame:CGRectMake(190.0f, 248.0f, 72.0f, 76.0f)];
-        [self.CurtainButton setFrame:CGRectMake(288.0f, 248.0f, 72.0f, 76.0f)];
-        [self.MusicButton setFrame:CGRectMake(386.0f, 248.0f, 72.0f, 76.0f)];
-        [self.modeView setFrame:CGRectMake(160.0f, 64.0f, 588.0f, 156.0f)];
-        [self.modeView setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg_mode_p"]]];
-        [self.scrollView setFrame:CGRectMake(110.0f, 30.0f, 368.0f, 100.0f)];
-        [self.scrollLeft setFrame:CGRectMake(50.0f, 55.0f, 25.0f, 50.0f)];
-        [self.scrollRight setFrame:CGRectMake(self.modeView.frame.size.width - 75.0f, 55.0f, 25.0f, 50.0f)];
-        self.countInOnePage = 2;
-        [self.detailView setFrame:CGRectMake(160.0f, 384.0f, 588.0f, 600.0f)];
+        [self.LightButton setFrame:CGRectMake(190.0f, 95.0f, 72.0f, 76.0f)];
+        [self.CurtainButton setFrame:CGRectMake(288.0f, 95.0f, 72.0f, 76.0f)];
+        [self.MusicButton setFrame:CGRectMake(386.0f, 95.0f, 72.0f, 76.0f)];
+        [self.detailView setFrame:CGRectMake(160.0f, 226.0f, 588.0f, 580.0f)];
         [self.detailView setPagingEnabled:NO];
-        [self.detailBackground setFrame:CGRectMake(160.0f, 344.0f, 588.0f, 640.0f)];
+        [self.detailBackground setFrame:CGRectMake(160.0f, 186.0f, 588.0f, 640.0f)];
     }
     
     [self setupDetailView:self.currentModel Type:self.currentType];
-    
-    if (self.currentModel.modesNames.count % self.countInOnePage == 0) {
-        self.modesCount = self.currentModel.modesNames.count / self.countInOnePage;
-    } else {
-        self.modesCount = self.currentModel.modesNames.count / self.countInOnePage + 1;
-    }
-    [self setupModeSelectBar:self.currentModel];
 }
 
 - (void)didReceiveMemoryWarning

@@ -77,7 +77,6 @@
 {
     NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
     NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
-    [(SHControlViewController *)self.mainController setCurrentMode:msg];
     NSLog(@"read:%@", msg);
     [sock disconnect];
 }
