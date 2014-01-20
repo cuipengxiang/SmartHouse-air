@@ -20,9 +20,9 @@
 @property(nonatomic, strong)NSThread *myModeThread;
 @property(nonatomic, strong)UINavigationBar *navigationBar;
 @property(nonatomic, strong)UITableView *tableView;
+@property(nonatomic, strong)UIButton *ModeButton;
 @property(nonatomic, strong)UIButton *LightButton;
 @property(nonatomic, strong)UIButton *CurtainButton;
-@property(nonatomic, strong)UIButton *MusicButton;
 @property(nonatomic, strong)UIButton *AirButton;
 @property(nonatomic, strong)UIScrollView *detailView;
 @property(nonatomic, strong)UIView *GuidePanel;
@@ -51,11 +51,12 @@
 
 - (void)onLightClick:(id)sender;
 - (void)onCuitainClick:(id)sender;
-- (void)onMusicClick:(id)sender;
+- (void)onModeClick:(id)sender;
 - (void)onAirClick:(id)sender;
 
 - (void)sendCommand:(NSString *)cmd;
 - (void)setNetworkState:(BOOL)state;
-
+- (void)onModeButtonClick:(UIButton *)sender;
+- (void)setCurrentMode:(NSString *)mode;
 
 @end
