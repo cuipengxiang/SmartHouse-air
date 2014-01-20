@@ -28,8 +28,9 @@
 
 @property (nonatomic)dispatch_queue_t socketQueue;
 @property (nonatomic ,strong)AppDelegate *myDelegate;
-@property (nonatomic, strong)NSMutableArray *buttonNames;
-@property (nonatomic, strong)NSMutableArray *buttonCmds;
+@property (nonatomic, strong)NSMutableArray *airModes;
+@property (nonatomic, strong)NSMutableArray *airCmds;
+@property (nonatomic, strong)NSMutableArray *airAddrs;
 @property (nonatomic, retain)SHControlViewController *controller;
 @property (nonatomic, strong)UIButton *settingButton;
 @property (nonatomic, strong)UIButton *open_close;
@@ -41,8 +42,7 @@
 @property (nonatomic) bool isOnNow;
 
 - (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller;
-- (void)setButtons:(NSMutableArray *)names andCmd:(NSMutableArray *)cmds;
-- (void)onButtonClick:(UIButton *)button;
+- (void)setAddrs:(NSMutableArray *)addrs andCmds:(NSMutableArray *)cmds andModes:(NSMutableArray *)modes;
 - (void)onSettingButtonClick:(UIButton *)button;
 - (void)onCloseButtonClick:(UIButton *)button;
 - (void)onHigherButtonClick:(UIButton *)button;

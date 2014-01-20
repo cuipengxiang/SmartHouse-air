@@ -123,23 +123,32 @@
             [wholeHouse.curtainBtns addObject:curtainBtnstemp];
             [wholeHouse.curtainCmds addObject:curtainCmdstemp];
         }
-        int musicsCount = [[fileArray objectAtIndex:arrayCursor] intValue];
+        int airsCount = [[fileArray objectAtIndex:arrayCursor] intValue];
         arrayCursor++;
-        for (int j = 0; j < musicsCount; j++) {
-            NSArray *musics = [[fileArray objectAtIndex:arrayCursor] componentsSeparatedByString:@"|"];
+        for (int j = 0; j < airsCount; j++) {
+            NSArray *airs = [[fileArray objectAtIndex:arrayCursor] componentsSeparatedByString:@"|"];
             arrayCursor++;
-            [tempModel.musicNames addObject:[musics objectAtIndex:0]];
-            [wholeHouse.musicNames addObject:[musics objectAtIndex:0]];
-            NSMutableArray *musicBtnstemp = [[NSMutableArray alloc] init];
-            NSMutableArray *musicCmdstemp = [[NSMutableArray alloc] init];
-            for (int k = 1; k < musics.count; k = k + 2) {
-                [musicBtnstemp addObject:[musics objectAtIndex:k]];
-                [musicCmdstemp addObject:[musics objectAtIndex:k + 1]];
+            [tempModel.airNames addObject:[airs objectAtIndex:0]];
+            [wholeHouse.airNames addObject:[airs objectAtIndex:0]];
+            NSMutableArray *airAddrstemp = [[NSMutableArray alloc] init];
+            NSMutableArray *airCmdstemp = [[NSMutableArray alloc] init];
+            NSMutableArray *airModestemp = [[NSMutableArray alloc] init];
+            for (int k = 1; k < 3; k++) {
+                [airAddrstemp addObject:[airs objectAtIndex:k]];
             }
-            [tempModel.musicBtns addObject:musicBtnstemp];
-            [tempModel.musicCmds addObject:musicCmdstemp];
-            [wholeHouse.musicBtns addObject:musicBtnstemp];
-            [wholeHouse.musicCmds addObject:musicCmdstemp];
+            for (int k = 3; k < 5; k++) {
+                [airCmdstemp addObject:[airs objectAtIndex:k]];
+            }
+            int modecount = [[airs objectAtIndex:5] integerValue];
+            for (int k = 6; k < 6 + modecount; k++) {
+                [airModestemp addObject:[airs objectAtIndex:k]];
+            }
+            [tempModel.airAddrs addObject:airAddrstemp];
+            [tempModel.airCmds addObject:airCmdstemp];
+            [tempModel.airModes addObject:airModestemp];
+            [wholeHouse.airAddrs addObject:airAddrstemp];
+            [wholeHouse.airCmds addObject:airCmdstemp];
+            [wholeHouse.airModes addObject:airModestemp];
         }
         [myDelegate.models addObject:tempModel];
     }

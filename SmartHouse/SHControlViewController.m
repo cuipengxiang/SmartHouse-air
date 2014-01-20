@@ -200,6 +200,8 @@
     NSMutableArray *detailViewNames = nil;
     NSMutableArray *detailViewBtns = nil;
     NSMutableArray *detailViewCmds = nil;
+    NSMutableArray *airViewModes = nil;
+    NSMutableArray *airViewAddrs = nil;
     switch (type) {
         case TYPE_MODE:
             detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.modesNames];
@@ -232,9 +234,10 @@
             }
             break;
         case TYPE_AIR:
-            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.musicNames];
-            detailViewBtns = [[NSMutableArray alloc] initWithArray:self.currentModel.musicBtns];
-            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.musicCmds];
+            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.airNames];
+            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.airCmds];
+            airViewModes = [[NSMutableArray alloc] initWithArray:self.currentModel.airModes];
+            airViewAddrs = [[NSMutableArray alloc] initWithArray:self.currentModel.airAddrs];
             if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
                 [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_air_l"]];
             } else {
@@ -304,7 +307,7 @@
             }
             for (int i = 0; i < detailViewNames.count; i++) {
                 SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(i/2*844 + 26 + (i%2)*409, 45, 383, 490)andTitle:[detailViewNames objectAtIndex:i] andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
+                [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
                 [self.detailView addSubview:detailViewPanel];
             }
         } else {
@@ -312,7 +315,7 @@
             [self.detailView setContentSize:CGSizeMake(588, height)];
             for (int i = 0; i < detailViewNames.count; i++) {
                 SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(104, i*300, 380, 280) andTitle:[detailViewNames objectAtIndex:i] andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
+                [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
                 [self.detailView addSubview:detailViewPanel];
             }
         }
@@ -334,13 +337,7 @@
                 [self.detailView addSubview:button];
             }
         } else {
-            int height = MAX(580, (300 * detailViewNames.count));
-            [self.detailView setContentSize:CGSizeMake(588, height)];
-            for (int i = 0; i < detailViewNames.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(104, i*300, 380, 280) andTitle:[detailViewNames objectAtIndex:i] andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
-            }
+            
         }
     }
 

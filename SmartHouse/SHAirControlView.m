@@ -44,10 +44,11 @@
     return self;
 }
 
-- (void)setButtons:(NSMutableArray *)names andCmd:(NSMutableArray *)cmds
+- (void)setAddrs:(NSMutableArray *)addrs andCmds:(NSMutableArray *)cmds andModes:(NSMutableArray *)modes
 {
-    self.buttonNames = [[NSMutableArray alloc] initWithArray:names];
-    self.buttonCmds = [[NSMutableArray alloc] initWithArray:cmds];
+    self.airAddrs = addrs;
+    self.airCmds = cmds;
+    self.airModes = modes;
     
     self.open_close = [[UIButton alloc] initWithFrame:CGRectMake(30.0, 64.0, 93.0, 33.0)];
     [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateNormal];
@@ -60,11 +61,12 @@
     modeImage = [[UIImageView alloc] initWithFrame:CGRectMake(8.0, 9.5, 30.0, 55.0)];
     [modeImage setImage:[UIImage imageNamed:@"panel_title_mode"]];
     [modePanel addSubview:modeImage];
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < modes.count; i++) {
+        int location = [@"01234" rangeOfString:[modes objectAtIndex:i]].location;
         UIButton *modebutton = [[UIButton alloc] initWithFrame:CGRectMake(45.5 + 54.0 * i, 9.0, 46.0, 56.0)];
-        NSString *imageNameNormal = [NSString stringWithFormat:@"btn_mode_%d_normal", i];
-        NSString *imageNameSelected = [NSString stringWithFormat:@"btn_mode_%d_selected", i];
-        [modebutton setTag:MODE_BUTTON_BASE_TAG + i];
+        NSString *imageNameNormal = [NSString stringWithFormat:@"btn_mode_%d_normal", location];
+        NSString *imageNameSelected = [NSString stringWithFormat:@"btn_mode_%d_selected", location];
+        [modebutton setTag:MODE_BUTTON_BASE_TAG + location];
         [modebutton setBackgroundImage:[UIImage imageNamed:imageNameNormal] forState:UIControlStateNormal];
         [modebutton setBackgroundImage:[UIImage imageNamed:imageNameSelected] forState:UIControlStateSelected];
         [modebutton addTarget:self action:@selector(onModeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -153,9 +155,9 @@
 - (void)onModeButtonClick:(UIButton *)button
 {
     [button setSelected:YES];
-    for (int i = 0; i < modePanel.subviews.count - 1; i++) {
-        if (button.tag != [[modePanel viewWithTag:i + MODE_BUTTON_BASE_TAG] tag]) {
-            [(UIButton *)[modePanel viewWithTag:i + MODE_BUTTON_BASE_TAG] setSelected:NO];
+    for (int i = 0; i < self.airModes.count; i++) {
+        if ([[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] tag] != button.tag) {
+            [(UIButton *)[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] setSelected:NO];
         }
     }
 }
@@ -184,7 +186,7 @@
 {
     
 }
-
+/*
 - (void)onButtonClick:(UIButton *)button
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
@@ -195,7 +197,7 @@
     });
     
 }
-
+*/
 
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {

@@ -25,10 +25,10 @@
         self.curtainNames = [[NSMutableArray alloc] init];
         self.curtainBtns = [[NSMutableArray alloc] init];
         self.curtainCmds = [[NSMutableArray alloc] init];
-        self.musicNames = [[NSMutableArray alloc] init];
-        self.musicBtns = [[NSMutableArray alloc] init];
-        self.musicCmds = [[NSMutableArray alloc] init];
-        
+        self.airNames = [[NSMutableArray alloc] init];
+        self.airModes = [[NSMutableArray alloc] init];
+        self.airCmds = [[NSMutableArray alloc] init];
+        self.airAddrs = [[NSMutableArray alloc] init];
     }
     return self;
 }

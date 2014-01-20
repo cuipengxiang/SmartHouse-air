@@ -21,8 +21,10 @@
 @property (nonatomic,strong)NSMutableArray *curtainNames;
 @property (nonatomic,strong)NSMutableArray *curtainBtns;
 @property (nonatomic,strong)NSMutableArray *curtainCmds;
-@property (nonatomic,strong)NSMutableArray *musicNames;
-@property (nonatomic,strong)NSMutableArray *musicBtns;
-@property (nonatomic,strong)NSMutableArray *musicCmds;
+@property (nonatomic,strong)NSMutableArray *airNames;
+@property (nonatomic,strong)NSMutableArray *airModes;
+@property (nonatomic,strong)NSMutableArray *airCmds;
+@property (nonatomic,strong)NSMutableArray *airAddrs;
+
 
 @end
