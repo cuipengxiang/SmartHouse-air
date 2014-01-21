@@ -24,10 +24,13 @@
 
     UIImageView *modeImage;
     UIImageView *speedImage;
+    
+    BOOL skip;
 }
 
 @property (nonatomic)dispatch_queue_t socketQueue;
-@property (nonatomic ,strong)AppDelegate *myDelegate;
+@property (nonatomic, strong)AppDelegate *myDelegate;
+@property (nonatomic, strong)NSThread *myModeThread;
 @property (nonatomic, strong)NSMutableArray *airModes;
 @property (nonatomic, strong)NSMutableArray *airCmds;
 @property (nonatomic, strong)NSMutableArray *airAddrs;
@@ -39,7 +42,8 @@
 @property (nonatomic) int currentMode;
 @property (nonatomic) int currentSpeed;
 @property (nonatomic) int currentTemp;
-@property (nonatomic) bool isOnNow;
+@property (nonatomic) int isOnNow;
+
 
 - (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller;
 - (void)setAddrs:(NSMutableArray *)addrs andCmds:(NSMutableArray *)cmds andModes:(NSMutableArray *)modes;

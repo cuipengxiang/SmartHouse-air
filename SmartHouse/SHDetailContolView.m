@@ -10,6 +10,8 @@
 
 #define BUTTON_BASE_TAG 4000
 #define BUTTON_DELAY 1.0
+#define TYPE_LIGHT 1
+#define TYPE_CURTAIN 2
 
 @implementation SHDetailContolView
 
@@ -37,7 +39,7 @@
     if (self) {
         UIImageView *background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
         self.type = type;
-        if (type == 0) {
+        if (type == TYPE_LIGHT) {
             [background setImage:[UIImage imageNamed:@"bg_light"]];
         } else {
             [background setImage:[UIImage imageNamed:@"bg_curtain"]];
@@ -65,7 +67,7 @@
                 [button setBackgroundImage:[UIImage imageNamed:@"btn_light_control"] forState:UIControlStateNormal];
                 [button addTarget:self action:@selector(onButtonClick:) forControlEvents:UIControlEventTouchUpInside];
             } else if (i == 2) {
-                if (self.type == 0) {
+                if (self.type == TYPE_LIGHT) {
                     [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"light_%d",i]] forState:UIControlStateNormal];
                 } else {
                     [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"curtain_%d",i]] forState:UIControlStateNormal];
@@ -74,7 +76,7 @@
                 [button addTarget:self action:@selector(onButtonUp:) forControlEvents:UIControlEventTouchUpInside];
                 [button addTarget:self action:@selector(onButtonUp:) forControlEvents:UIControlEventTouchUpOutside];
             } else if (i == 3) {
-                if (self.type == 0) {
+                if (self.type == TYPE_LIGHT) {
                     [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"light_%d",i]] forState:UIControlStateNormal];
                 } else {
                     [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"curtain_%d",i]] forState:UIControlStateNormal];

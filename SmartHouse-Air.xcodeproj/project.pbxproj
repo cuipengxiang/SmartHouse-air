@@ -208,6 +208,8 @@
 		D87A67EB1818B24300F49363 /* state_2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D87A67E91818B24300F49363 /* state_2@2x.png */; };
 		D88260C2180D37390096C6CA /* icon1.png in Resources */ = {isa = PBXBuildFile; fileRef = D88260C0180D37390096C6CA /* icon1.png */; };
 		D88260C3180D37390096C6CA /* icon1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D88260C1180D37390096C6CA /* icon1@2x.png */; };
+		D8B2F3AE188E57D500472E0B /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = D8B2F3AD188E57D500472E0B /* RegexKitLite.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D8B2F3B0188E583C00472E0B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D8B2F3AF188E583C00472E0B /* libicucore.dylib */; };
 		D8EEBD0D17BC7F8200200262 /* SHDetailContolView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8EEBD0C17BC7F8200200262 /* SHDetailContolView.m */; };
 		D8F056EE17BA8CE300DF2928 /* SHControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D8F056EC17BA8CE300DF2928 /* SHControlViewController.m */; };
 		D8F056FB17BAC95600DF2928 /* SHSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D8F056F917BAC95500DF2928 /* SHSettingsViewController.m */; };
@@ -395,14 +397,14 @@
 		D83A7361188CC3F200EF636B /* btn_switch_off@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn_switch_off@2x.png"; sourceTree = "<group>"; };
 		D83A7362188CC3F200EF636B /* btn_switch_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn_switch_on.png; sourceTree = "<group>"; };
 		D83A7363188CC3F200EF636B /* btn_switch_on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn_switch_on@2x.png"; sourceTree = "<group>"; };
-		D8421CFB17BA853500C39DA0 /* SmartHouse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartHouse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8421CFB17BA853500C39DA0 /* SmartHouse-Air.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SmartHouse-Air.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8421CFE17BA853500C39DA0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D8421D0017BA853500C39DA0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D8421D0217BA853500C39DA0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		D8421D0617BA853500C39DA0 /* SmartHouse-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SmartHouse-Info.plist"; sourceTree = "<group>"; };
+		D8421D0617BA853500C39DA0 /* SmartHouse-Air-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SmartHouse-Air-Info.plist"; sourceTree = "<group>"; };
 		D8421D0817BA853500C39DA0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D8421D0A17BA853500C39DA0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		D8421D0C17BA853500C39DA0 /* SmartHouse-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SmartHouse-Prefix.pch"; sourceTree = "<group>"; };
+		D8421D0C17BA853500C39DA0 /* SmartHouse-Air-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SmartHouse-Air-Prefix.pch"; sourceTree = "<group>"; };
 		D8421D0D17BA853500C39DA0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D8421D0E17BA853500C39DA0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		D8421D1617BA853500C39DA0 /* SHLoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SHLoginViewController.h; sourceTree = "<group>"; };
@@ -425,6 +427,9 @@
 		D87A67E91818B24300F49363 /* state_2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "state_2@2x.png"; sourceTree = "<group>"; };
 		D88260C0180D37390096C6CA /* icon1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon1.png; sourceTree = SOURCE_ROOT; };
 		D88260C1180D37390096C6CA /* icon1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon1@2x.png"; sourceTree = SOURCE_ROOT; };
+		D8B2F3AC188E57D500472E0B /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
+		D8B2F3AD188E57D500472E0B /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
+		D8B2F3AF188E583C00472E0B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
 		D8EEBD0B17BC7F8200200262 /* SHDetailContolView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHDetailContolView.h; sourceTree = "<group>"; };
 		D8EEBD0C17BC7F8200200262 /* SHDetailContolView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHDetailContolView.m; sourceTree = "<group>"; };
 		D8F056EB17BA8CE300DF2928 /* SHControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHControlViewController.h; sourceTree = "<group>"; };
@@ -440,6 +445,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8B2F3B0188E583C00472E0B /* libicucore.dylib in Frameworks */,
 				D8421CFF17BA853500C39DA0 /* UIKit.framework in Frameworks */,
 				D8421D0117BA853500C39DA0 /* Foundation.framework in Frameworks */,
 				D8421D0317BA853500C39DA0 /* CoreGraphics.framework in Frameworks */,
@@ -474,7 +480,7 @@
 		D8421CFC17BA853500C39DA0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D8421CFB17BA853500C39DA0 /* SmartHouse.app */,
+				D8421CFB17BA853500C39DA0 /* SmartHouse-Air.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -482,6 +488,7 @@
 		D8421CFD17BA853500C39DA0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8B2F3AF188E583C00472E0B /* libicucore.dylib */,
 				52336A0317C086D50094CE29 /* Security.framework */,
 				52336A0117C086CC0094CE29 /* CFNetwork.framework */,
 				D8421CFE17BA853500C39DA0 /* UIKit.framework */,
@@ -532,12 +539,22 @@
 				D88260C1180D37390096C6CA /* icon1@2x.png */,
 				D81BD49017C5F16D00D96702 /* icon@2x.png */,
 				D81BD48E17C5F16800D96702 /* icon.png */,
-				D8421D0617BA853500C39DA0 /* SmartHouse-Info.plist */,
+				D8421D0617BA853500C39DA0 /* SmartHouse-Air-Info.plist */,
 				D8421D0717BA853500C39DA0 /* InfoPlist.strings */,
 				D8421D0A17BA853500C39DA0 /* main.m */,
-				D8421D0C17BA853500C39DA0 /* SmartHouse-Prefix.pch */,
+				D8421D0C17BA853500C39DA0 /* SmartHouse-Air-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D8B2F3AB188E57AE00472E0B /* RegeKitLite */ = {
+			isa = PBXGroup;
+			children = (
+				D8B2F3AC188E57D500472E0B /* RegexKitLite.h */,
+				D8B2F3AD188E57D500472E0B /* RegexKitLite.m */,
+			);
+			name = RegeKitLite;
+			path = RegexKitLite;
 			sourceTree = "<group>";
 		};
 		D8F056E217BA8AAE00DF2928 /* Resources */ = {
@@ -727,6 +744,7 @@
 		D8F056E317BA8AD000DF2928 /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				D8B2F3AB188E57AE00472E0B /* RegeKitLite */,
 				5214CB7517C068C000BDCEBC /* TCP */,
 			);
 			name = Vendors;
@@ -736,9 +754,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D8421CFA17BA853500C39DA0 /* SmartHouse */ = {
+		D8421CFA17BA853500C39DA0 /* SmartHouse-Air */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D8421D1E17BA853500C39DA0 /* Build configuration list for PBXNativeTarget "SmartHouse" */;
+			buildConfigurationList = D8421D1E17BA853500C39DA0 /* Build configuration list for PBXNativeTarget "SmartHouse-Air" */;
 			buildPhases = (
 				D8421CF717BA853500C39DA0 /* Sources */,
 				D8421CF817BA853500C39DA0 /* Frameworks */,
@@ -748,9 +766,9 @@
 			);
 			dependencies = (
 			);
-			name = SmartHouse;
+			name = "SmartHouse-Air";
 			productName = SmartHouse;
-			productReference = D8421CFB17BA853500C39DA0 /* SmartHouse.app */;
+			productReference = D8421CFB17BA853500C39DA0 /* SmartHouse-Air.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -762,7 +780,7 @@
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = Roc;
 			};
-			buildConfigurationList = D8421CF617BA853500C39DA0 /* Build configuration list for PBXProject "SmartHouse" */;
+			buildConfigurationList = D8421CF617BA853500C39DA0 /* Build configuration list for PBXProject "SmartHouse-Air" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -774,7 +792,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D8421CFA17BA853500C39DA0 /* SmartHouse */,
+				D8421CFA17BA853500C39DA0 /* SmartHouse-Air */,
 			);
 		};
 /* End PBXProject section */
@@ -989,6 +1007,7 @@
 				D8F056EE17BA8CE300DF2928 /* SHControlViewController.m in Sources */,
 				D8F056FB17BAC95600DF2928 /* SHSettingsViewController.m in Sources */,
 				D816387017BB0501008FAD0E /* SHReadConfigFile.m in Sources */,
+				D8B2F3AE188E57D500472E0B /* RegexKitLite.m in Sources */,
 				D86B0D451819FD620098A755 /* SHSettingsNewViewController.m in Sources */,
 				52E2297C17BBAA470086355A /* SHRoomModel.m in Sources */,
 				D8EEBD0D17BC7F8200200262 /* SHDetailContolView.m in Sources */,
@@ -1074,11 +1093,11 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer: 鹏翔 崔 (GVQA7B9MVH)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Prefix.pch";
-				INFOPLIST_FILE = "SmartHouse/SmartHouse-Info.plist";
+				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Air-Prefix.pch";
+				INFOPLIST_FILE = "SmartHouse/SmartHouse-Air-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "SmartHouse-Air";
 				PROVISIONING_PROFILE = "34D1400C-2E59-4806-BB14-43CC38EFC6E1";
 				SDKROOT = iphoneos6.1;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -1091,11 +1110,11 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer: 鹏翔 崔 (GVQA7B9MVH)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Prefix.pch";
-				INFOPLIST_FILE = "SmartHouse/SmartHouse-Info.plist";
+				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Air-Prefix.pch";
+				INFOPLIST_FILE = "SmartHouse/SmartHouse-Air-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "SmartHouse-Air";
 				PROVISIONING_PROFILE = "34D1400C-2E59-4806-BB14-43CC38EFC6E1";
 				SDKROOT = iphoneos6.1;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -1106,7 +1125,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D8421CF617BA853500C39DA0 /* Build configuration list for PBXProject "SmartHouse" */ = {
+		D8421CF617BA853500C39DA0 /* Build configuration list for PBXProject "SmartHouse-Air" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D8421D1C17BA853500C39DA0 /* Debug */,
@@ -1115,7 +1134,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D8421D1E17BA853500C39DA0 /* Build configuration list for PBXNativeTarget "SmartHouse" */ = {
+		D8421D1E17BA853500C39DA0 /* Build configuration list for PBXNativeTarget "SmartHouse-Air" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D8421D1F17BA853500C39DA0 /* Debug */,
