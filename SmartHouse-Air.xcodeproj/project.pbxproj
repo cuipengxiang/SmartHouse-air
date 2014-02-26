@@ -779,6 +779,11 @@
 			attributes = {
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = Roc;
+				TargetAttributes = {
+					D8421CFA17BA853500C39DA0 = {
+						DevelopmentTeam = 5BA6RP6GDL;
+					};
+				};
 			};
 			buildConfigurationList = D8421CF617BA853500C39DA0 /* Build configuration list for PBXProject "SmartHouse-Air" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1091,14 +1096,15 @@
 		D8421D1F17BA853500C39DA0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: 鹏翔 崔 (GVQA7B9MVH)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: 世倩 衣 (BZR7AKESU3)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Air-Prefix.pch";
 				INFOPLIST_FILE = "SmartHouse/SmartHouse-Air-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "SmartHouse-Air";
-				PROVISIONING_PROFILE = "34D1400C-2E59-4806-BB14-43CC38EFC6E1";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos6.1;
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;
@@ -1108,14 +1114,15 @@
 		D8421D2017BA853500C39DA0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: 鹏翔 崔 (GVQA7B9MVH)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: 世倩 衣 (BZR7AKESU3)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SmartHouse/SmartHouse-Air-Prefix.pch";
 				INFOPLIST_FILE = "SmartHouse/SmartHouse-Air-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "SmartHouse-Air";
-				PROVISIONING_PROFILE = "34D1400C-2E59-4806-BB14-43CC38EFC6E1";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos6.1;
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;

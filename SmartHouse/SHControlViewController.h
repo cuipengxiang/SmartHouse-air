@@ -44,7 +44,7 @@
 
 - (void)setupNavigationBar:(float)width;
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type;
-- (void)updateViews:(SHRoomModel *)currentModel;
+- (void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index;
 
 - (void)onBackButtonClick;
 - (void)onSettingsButtonClick;

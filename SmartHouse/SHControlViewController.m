@@ -106,15 +106,22 @@
     [self.view addSubview:self.CurtainButton];
     [self.view addSubview:self.AirButton];
     
+    [self.ModeButton setHidden:YES];
+    [self.LightButton setHidden:YES];
+    [self.CurtainButton setHidden:YES];
+    [self.AirButton setHidden:YES];
+    
     [self setupDetailView:self.currentModel Type:TYPE_MODE];
     
     [self.view addSubview:self.detailBackground];
     [self.view addSubview:self.detailView];
     [self.view addSubview:self.GuidePanel];
     
+    /*
     if (![self.myModeThread isExecuting]) {
         [self.myModeThread start];
     }
+    */
 }
 
 //设置导航栏
@@ -415,8 +422,19 @@
     [self setupDetailView:self.currentModel Type:TYPE_AIR];
 }
 
--(void)updateViews:(SHRoomModel *)currentModel
+-(void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index
 {
+    if (index == 0) {
+        [self.LightButton setHidden:YES];
+        [self.ModeButton setHidden:YES];
+        [self.CurtainButton setHidden:YES];
+        [self.AirButton setHidden:YES];
+    } else {
+        [self.LightButton setHidden:NO];
+        [self.ModeButton setHidden:NO];
+        [self.CurtainButton setHidden:NO];
+        [self.AirButton setHidden:NO];
+    }
     [self setupDetailView:self.currentModel Type:TYPE_MODE];
 }
 
@@ -429,7 +447,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     self.currentModel = [self.myAppDelegate.models objectAtIndex:indexPath.row];
-    [self updateViews:self.currentModel];
+    [self updateViews:self.currentModel atIndex:indexPath.row];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
