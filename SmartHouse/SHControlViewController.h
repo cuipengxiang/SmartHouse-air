@@ -42,8 +42,9 @@
 @property BOOL needquery;
 @property int skipQuery;
 
+- (void)setViewFramesForOrientation:(UIInterfaceOrientation)orientation AtIndex:(int)index;
 - (void)setupNavigationBar:(float)width;
-- (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type;
+- (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type AtIndex:(int)index;
 - (void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index;
 
 - (void)onBackButtonClick;
