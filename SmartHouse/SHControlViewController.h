@@ -24,6 +24,7 @@
 @property(nonatomic, strong)UIButton *LightButton;
 @property(nonatomic, strong)UIButton *CurtainButton;
 @property(nonatomic, strong)UIButton *AirButton;
+@property(nonatomic, strong)UIButton *NetStateButton;
 @property(nonatomic, strong)UIScrollView *detailView;
 @property(nonatomic, strong)UIView *GuidePanel;
 @property(nonatomic, strong)UIImageView *detailBackground;
@@ -54,6 +55,7 @@
 - (void)onCuitainClick:(id)sender;
 - (void)onModeClick:(id)sender;
 - (void)onAirClick:(id)sender;
+- (void)onNetStateButtonClick:(id)sender;
 
 - (void)sendCommand:(NSString *)cmd;
 - (void)setNetworkState:(BOOL)state;

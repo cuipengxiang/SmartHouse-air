@@ -9,7 +9,7 @@
 #import "SHControlViewController.h"
 #import "SHSettingsViewController.h"
 #import "SHDetailContolView.h"
-#import "SHSettingsNewViewController.h"
+#import "SHSettingsViewController.h"
 #import "SHAirControlView.h"
 
 #define GUIDE_PANEL_BASE_TAG 2000
@@ -44,6 +44,19 @@
     
     self.detailView = [[UIScrollView alloc] init];
     self.detailBackground = [[UIImageView alloc] init];
+    
+    self.NetStateButton = [[UIButton alloc] init];
+    [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_2"] forState:UIControlStateNormal];
+    [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_1"] forState:UIControlStateSelected];
+    NSString *string = [[NSUserDefaults standardUserDefaults] objectForKey:@"network"];
+    if (string) {
+        if ([string isEqualToString:self.myAppDelegate.host1]) {
+            [self.NetStateButton setSelected:NO];
+        } else {
+            [self.NetStateButton setSelected:YES];
+        }
+    }
+    [self.NetStateButton addTarget:self action:@selector(onNetStateButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.ModeButton = [[UIButton alloc] init];
     [self.ModeButton setBackgroundImage:[UIImage imageNamed:@"btn_mode"] forState:UIControlStateNormal];
@@ -85,6 +98,7 @@
     [self.view addSubview:self.LightButton];
     [self.view addSubview:self.CurtainButton];
     [self.view addSubview:self.AirButton];
+    [self.view addSubview:self.NetStateButton];
     
     [self.ModeButton setHidden:YES];
     [self.LightButton setHidden:YES];
@@ -160,7 +174,7 @@
 
 - (void)onSettingsButtonClick
 {
-    SHSettingsNewViewController *controller = [[SHSettingsNewViewController alloc] initWithNibName:nil bundle:nil];
+    SHSettingsViewController *controller = [[SHSettingsViewController alloc] initWithNibName:nil bundle:nil];
     controller.controller = self;
     [self presentViewController:controller animated:YES completion:^(void){
         self.needquery = NO;
@@ -238,7 +252,7 @@
     if (type != TYPE_MODE) {
         [self.detailView setContentSize:CGSizeMake(844*detailViewNames.count, 553)];
         if (detailViewNames.count > 1) {
-            [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 694, (detailViewNames.count*2-1)*15, 44)];
+            [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 685, (detailViewNames.count*2-1)*15, 44)];
             for (int i = 0; i < detailViewNames.count; i++) {
                 UIImageView *image = [[UIImageView alloc] initWithFrame:CGRectMake(i*30, 14.5, 15, 15)];
                 if (i == 0) {
@@ -287,7 +301,7 @@
     } else if (type == TYPE_AIR) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(i/2*844 + 26 + (i%2)*409, 45, 383, 490)andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i+ 230.5, 45, 383, 490) andTitle:[detailViewNames objectAtIndex:i] andController:self];
                 [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
                 [self.detailView addSubview:detailViewPanel];
             }
@@ -305,12 +319,12 @@
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
                 UIButton *button = [[UIButton alloc] init];
-                [button setFrame:CGRectMake(64.0 + 184.0 * (i % 4), 60.0 + 88.0 * (i / 4), 164.0, 58.0)];
-                [button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateNormal];
-                [button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateSelected];
-                [button setTitleEdgeInsets:UIEdgeInsetsMake(0, 30, 0, 0)];
-                [button setBackgroundImage:[UIImage imageNamed:@"mode_normal"] forState:UIControlStateNormal];
-                [button setBackgroundImage:[UIImage imageNamed:@"mode_selected"] forState:UIControlStateSelected];
+                [button setFrame:CGRectMake(76.0 + 246.0 * (i % 3), 75.0 + 124.0 * (i / 3), 200.0, 74.0)];
+                //[button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateNormal];
+                //[button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateSelected];
+                //[button setTitleEdgeInsets:UIEdgeInsetsMake(0, 30, 0, 0)];
+                [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_normal%d", i]] forState:UIControlStateNormal];
+                [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_selected%d", i]] forState:UIControlStateHighlighted];
                 [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
                 [button setTitleColor:[UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1.0] forState:UIControlStateNormal];
                 [button setTag:MODE_BTN_BASE_TAG + i];
@@ -326,11 +340,12 @@
 
 - (void)onModeButtonClick:(UIButton *)sender
 {
+    /*
     for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count; i++) {
         [(UIButton *)[self.detailView viewWithTag:i] setSelected:NO];
     }
     [sender setSelected:YES];
-    
+    */
     self.skipQuery = 1;
     NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", [self.currentModel.modesCmds objectAtIndex:sender.tag - MODE_BTN_BASE_TAG]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
@@ -394,6 +409,14 @@
 - (void)onAirClick:(id)sender
 {
     [self setupDetailView:self.currentModel Type:TYPE_AIR AtIndex:self.tableView.indexPathForSelectedRow.row];
+}
+
+- (void)onNetStateButtonClick:(id)sender
+{
+    [self.NetStateButton setSelected:![self.NetStateButton isSelected]];
+    self.myAppDelegate.host = [self.NetStateButton isSelected]? self.myAppDelegate.host2 : self.myAppDelegate.host1;
+    [[NSUserDefaults standardUserDefaults] setObject:self.myAppDelegate.host forKey:@"network"];
+    
 }
 
 -(void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index
@@ -515,6 +538,7 @@
     if (UIInterfaceOrientationIsLandscape(orientation)) {
         [self.navigationBar setFrame:CGRectMake(0, 0, 1024, 44)];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 704)];
+        [self.NetStateButton setFrame:CGRectMake(850.0, 64.0, 144.0, 36.0)];
         [self.ModeButton setFrame:CGRectMake(192.0f, 90.0f, 66.0f, 70.0f)];
         [self.LightButton setFrame:CGRectMake(292.0f, 90.0f, 66.0f, 70.0f)];
         [self.CurtainButton setFrame:CGRectMake(392.0f, 90.0f, 66.0f, 70.0f)];
@@ -531,6 +555,7 @@
     } else {
         [self.navigationBar setFrame:CGRectMake(0, 0, 768, 44)];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 960)];
+        [self.NetStateButton setFrame:CGRectMake(594.0, 64.0, 144.0, 36.0)];
         [self.ModeButton setFrame:CGRectMake(190.0f, 95.0f, 72.0f, 76.0f)];
         [self.LightButton setFrame:CGRectMake(288.0f, 95.0f, 72.0f, 76.0f)];
         [self.CurtainButton setFrame:CGRectMake(386.0f, 95.0f, 72.0f, 76.0f)];
@@ -570,7 +595,6 @@
         }
     });
 }
-
 
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {

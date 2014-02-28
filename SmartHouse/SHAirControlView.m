@@ -28,7 +28,7 @@
         [titleLabel setText:titleString];
         [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
-        [titleLabel setBackgroundColor:[UIColor clearColor]];
+        [titleLabel setBackgroundColor:[UIColor greenColor]];
         [titleLabel sizeToFit];
         [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 21, titleLabel.frame.size.width, titleLabel.frame.size.height)];
         [self addSubview:titleLabel];
@@ -40,9 +40,9 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        UIImageView *background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-        [background setImage:[UIImage imageNamed:@"bg_air"]];
-        [self addSubview:background];
+        //UIImageView *background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+        //[background setImage:[UIImage imageNamed:@"bg_air"]];
+        //[self addSubview:background];
         self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
         self.isOnNow = 0;
         NSString *savedtemp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", [self.airAddrs objectAtIndex:0], [self.airAddrs objectAtIndex:1]]];
