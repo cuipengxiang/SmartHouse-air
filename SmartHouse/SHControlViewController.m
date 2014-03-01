@@ -297,7 +297,8 @@
     } else if (type == TYPE_CURTAIN) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
-                
+                SHCurtainControlView *curtainView = [[SHCurtainControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                [self.detailView addSubview:curtainView];
             }
         } else {
             int height = MAX(580, (150 * detailViewNames.count));
