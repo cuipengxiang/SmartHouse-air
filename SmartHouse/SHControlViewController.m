@@ -8,7 +8,8 @@
 
 #import "SHControlViewController.h"
 #import "SHSettingsViewController.h"
-#import "SHDetailContolView.h"
+#import "SHLightControlView.h"
+#import "SHCurtainControlView.h"
 #import "SHSettingsViewController.h"
 #import "SHAirControlView.h"
 
@@ -47,13 +48,12 @@
     
     self.NetStateButton = [[UIButton alloc] init];
     [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_2"] forState:UIControlStateNormal];
-    [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_1"] forState:UIControlStateSelected];
     NSString *string = [[NSUserDefaults standardUserDefaults] objectForKey:@"network"];
+    self.insideNetAddr = YES;
     if (string) {
-        if ([string isEqualToString:self.myAppDelegate.host1]) {
-            [self.NetStateButton setSelected:NO];
-        } else {
-            [self.NetStateButton setSelected:YES];
+        if ([string isEqualToString:self.myAppDelegate.host2]) {
+            [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_1"] forState:UIControlStateNormal];
+            self.insideNetAddr = NO;
         }
     }
     [self.NetStateButton addTarget:self action:@selector(onNetStateButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -77,6 +77,14 @@
     [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_air"] forState:UIControlStateNormal];
     [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_air"] forState:UIControlStateSelected];
     [self.AirButton addTarget:self action:@selector(onAirClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.leftButton = [[UIButton alloc] init];
+    [self.leftButton setBackgroundImage:[UIImage imageNamed:@"arrow_left"] forState:UIControlStateNormal];
+    [self.leftButton addTarget:self action:@selector(onLeftButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.rightButton = [[UIButton alloc] init];
+    [self.rightButton setBackgroundImage:[UIImage imageNamed:@"arrow_right"] forState:UIControlStateNormal];
+    [self.rightButton addTarget:self action:@selector(onRightButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.currentModel = [self.myAppDelegate.models objectAtIndex:0];
     self.tableView = [[UITableView alloc] init];
@@ -110,6 +118,11 @@
     [self.view addSubview:self.detailBackground];
     [self.view addSubview:self.detailView];
     [self.view addSubview:self.GuidePanel];
+    [self.view addSubview:self.leftButton];
+    [self.view addSubview:self.rightButton];
+    
+    [self.leftButton setHidden:YES];
+    [self.rightButton setHidden:YES];
     
     /*
     if (![self.myModeThread isExecuting]) {
@@ -252,7 +265,7 @@
     if (type != TYPE_MODE) {
         [self.detailView setContentSize:CGSizeMake(844*detailViewNames.count, 553)];
         if (detailViewNames.count > 1) {
-            [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 685, (detailViewNames.count*2-1)*15, 44)];
+            [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 675, (detailViewNames.count*2-1)*15, 44)];
             for (int i = 0; i < detailViewNames.count; i++) {
                 UIImageView *image = [[UIImageView alloc] initWithFrame:CGRectMake(i*30, 14.5, 15, 15)];
                 if (i == 0) {
@@ -264,44 +277,39 @@
                 [self.GuidePanel addSubview:image];
             }
             [self.GuidePanel setHidden:NO];
+            [self.leftButton setHidden:NO];
+            [self.rightButton setHidden:NO];
         }
     }
     if (type == TYPE_LIGHT) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(i/6*844 + 34.5 + (i%2)*395, 45 + i/2%3*155, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
+                SHLightControlView *lightView = [[SHLightControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                [self.detailView addSubview:lightView];
             }
         } else {
             int height = MAX(580, (150 * detailViewNames.count));
             [self.detailView setContentSize:CGSizeMake(588, height)];
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(104, i*150, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
+                
             }
         }
     } else if (type == TYPE_CURTAIN) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(i/6*844 + 34.5 + (i%2)*395, 45 + i/2%3*155, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
+                
             }
         } else {
             int height = MAX(580, (150 * detailViewNames.count));
             [self.detailView setContentSize:CGSizeMake(588, height)];
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHDetailContolView *detailViewPanel = [[SHDetailContolView alloc] initWithFrame:CGRectMake(104, i*150, 380, 140)andTitle:[detailViewNames objectAtIndex:i] andType:type andController:self];
-                [detailViewPanel setButtons:[detailViewBtns objectAtIndex:i] andCmd:[detailViewCmds objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
+                
             }
         }
     } else if (type == TYPE_AIR) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < detailViewNames.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i+ 230.5, 45, 383, 490) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 45, 383, 490) andTitle:[detailViewNames objectAtIndex:i] andController:self];
                 [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
                 [self.detailView addSubview:detailViewPanel];
             }
@@ -413,9 +421,20 @@
 
 - (void)onNetStateButtonClick:(id)sender
 {
-    [self.NetStateButton setSelected:![self.NetStateButton isSelected]];
-    self.myAppDelegate.host = [self.NetStateButton isSelected]? self.myAppDelegate.host2 : self.myAppDelegate.host1;
+    self.insideNetAddr = !self.insideNetAddr;
+    UIImage *netimage = self.insideNetAddr?[UIImage imageNamed:@"btn_switch_2"] : [UIImage imageNamed:@"btn_switch_1"];
+    [self.NetStateButton setImage:netimage forState:UIControlStateNormal];
+    self.myAppDelegate.host = self.insideNetAddr? self.myAppDelegate.host1 : self.myAppDelegate.host2;
     [[NSUserDefaults standardUserDefaults] setObject:self.myAppDelegate.host forKey:@"network"];
+}
+
+- (void)onLeftButtonClick:(UIButton *)sender
+{
+    
+}
+
+- (void)onRightButtonClick:(UIButton *)sender
+{
     
 }
 
@@ -544,6 +563,8 @@
         [self.CurtainButton setFrame:CGRectMake(392.0f, 90.0f, 66.0f, 70.0f)];
         [self.AirButton setFrame:CGRectMake(492.0f, 90.0f, 66.0f, 70.0f)];
         [self.detailView setPagingEnabled:YES];
+        [self.leftButton setFrame:CGRectMake(185.0, 431.0, 22.0, 41.0)];
+        [self.rightButton setFrame:CGRectMake(957.0, 431.0, 22.0, 41.0)];
         if (index == 0) {
             [self.detailView setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];

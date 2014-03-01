@@ -25,12 +25,15 @@
 @property(nonatomic, strong)UIButton *CurtainButton;
 @property(nonatomic, strong)UIButton *AirButton;
 @property(nonatomic, strong)UIButton *NetStateButton;
+@property(nonatomic, strong)UIButton *leftButton;
+@property(nonatomic, strong)UIButton *rightButton;
 @property(nonatomic, strong)UIScrollView *detailView;
 @property(nonatomic, strong)UIView *GuidePanel;
 @property(nonatomic, strong)UIImageView *detailBackground;
 @property(nonatomic, strong)UIButton *networkStateButton;
 @property(nonatomic, strong)UIBarButtonItem *networkBarButton;
 @property(nonatomic, strong)UINavigationItem *item;
+@property(nonatomic)BOOL insideNetAddr;
 
 @property(nonatomic)int currentType;
 
@@ -61,5 +64,8 @@
 - (void)setNetworkState:(BOOL)state;
 - (void)onModeButtonClick:(UIButton *)sender;
 - (void)setCurrentMode:(NSString *)mode;
+
+- (void)onLeftButtonClick:(UIButton *)sender;
+- (void)onRightButtonClick:(UIButton *)sender;
 
 @end
