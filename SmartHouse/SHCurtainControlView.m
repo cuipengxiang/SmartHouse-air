@@ -46,25 +46,39 @@
         self.onButton = [[UIButton alloc] initWithFrame:CGRectMake(173.5, 380.0, 71.0, 48.0)];
         [self.onButton setImage:[UIImage imageNamed:@"btn_curtain_open_normal"] forState:UIControlStateNormal];
         [self.onButton setImage:[UIImage imageNamed:@"btn_curtain_close_pressed"] forState:UIControlStateHighlighted];
-        [self.onButton addTarget:self action:@selector(onLessButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        [self.onButton addTarget:self action:@selector(onOnButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.onButton];
         
         self.offButton = [[UIButton alloc] initWithFrame:CGRectMake(264.5, 380.0, 71.0, 48.0)];
         [self.offButton setImage:[UIImage imageNamed:@"btn_curtain_close_normal"] forState:UIControlStateNormal];
         [self.offButton setImage:[UIImage imageNamed:@"btn_curtain_close_pressed"] forState:UIControlStateHighlighted];
-        [self.offButton addTarget:self action:@selector(onMoreButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        [self.offButton addTarget:self action:@selector(onOffButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.offButton];
         
         self.stopButton = [[UIButton alloc] initWithFrame:CGRectMake(355.5, 380.0, 71.0, 48.0)];
         [self.stopButton setImage:[UIImage imageNamed:@"btn_stop_normal"] forState:UIControlStateNormal];
         [self.stopButton setImage:[UIImage imageNamed:@"btn_stop_pressed"] forState:UIControlStateHighlighted];
-        [self.stopButton addTarget:self action:@selector(onMoreButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        [self.stopButton addTarget:self action:@selector(onStopButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.stopButton];
 
     }
     return self;
 }
 
+- (void)onOnButtonClick:(UIButton *)sender
+{
+    
+}
+
+- (void)onOffButtonClick:(UIButton *)sender
+{
+    
+}
+
+- (void)onStopButtonClick:(UIButton *)sender
+{
+    
+}
 
 /*
 // Only override drawRect: if you perform custom drawing.
