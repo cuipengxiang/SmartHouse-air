@@ -47,7 +47,7 @@
         [titleLabel setTextColor:[UIColor whiteColor]];
         [titleLabel setBackgroundColor:[UIColor greenColor]];
         [titleLabel sizeToFit];
-        [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 21, titleLabel.frame.size.width, titleLabel.frame.size.height)];
+        [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 31.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
         [self addSubview:titleLabel];
         
         self.BrightnessControl = [[UIView alloc] initWithFrame:CGRectMake(210.0, 400.0, 350.0, 48.0)];

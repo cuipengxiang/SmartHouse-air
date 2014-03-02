@@ -262,6 +262,8 @@
             break;
     }
     [self.GuidePanel setHidden:YES];
+    [self.leftButton setHidden:YES];
+    [self.rightButton setHidden:YES];
     if (type != TYPE_MODE) {
         [self.detailView setContentSize:CGSizeMake(844*detailViewNames.count, 553)];
         if (detailViewNames.count > 1) {
