@@ -40,8 +40,9 @@
 @property(nonatomic, retain)SHLoginViewController *backController;
 
 @property(nonatomic)SHRoomModel *currentModel;
-@property(nonatomic)int modesCount;
+
 @property(nonatomic)int detailPageCount;
+@property(nonatomic)int currentDetailPage;
 
 @property BOOL needquery;
 @property int skipQuery;

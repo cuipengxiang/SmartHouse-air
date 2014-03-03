@@ -204,6 +204,7 @@
     for (UIView *view in self.GuidePanel.subviews) {
         [view removeFromSuperview];
     }
+    
     [self.detailView setBounces:NO];
     [self.detailView setDelegate:self];
     [self.detailView setShowsHorizontalScrollIndicator:NO];
@@ -265,6 +266,8 @@
     [self.leftButton setHidden:YES];
     [self.rightButton setHidden:YES];
     if (type != TYPE_MODE) {
+        self.detailPageCount = detailViewNames.count;
+        self.currentDetailPage = 0;
         [self.detailView setContentSize:CGSizeMake(844*detailViewNames.count, 553)];
         if (detailViewNames.count > 1) {
             [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 675, (detailViewNames.count*2-1)*15, 44)];
@@ -433,12 +436,38 @@
 
 - (void)onLeftButtonClick:(UIButton *)sender
 {
-    
+    self.currentDetailPage = self.detailView.contentOffset.x/844.0;
+    if (self.currentDetailPage > 0) {
+        CGPoint point = CGPointMake((self.currentDetailPage - 1) * 844.0, self.detailView.contentOffset.y);
+        [self.detailView setContentOffset:point animated:YES];
+        
+        for (int i = 0; i < self.detailPageCount; i++) {
+            UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + i];
+            [image setImage:[UIImage imageNamed:@"unselected"]];
+        }
+        UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + self.currentDetailPage - 1];
+        [image setImage:[UIImage imageNamed:@"selected"]];
+    }
 }
 
 - (void)onRightButtonClick:(UIButton *)sender
 {
-    
+    if ((int)self.detailView.contentOffset.x % 844 != 0) {
+        self.currentDetailPage = self.detailView.contentOffset.x/844.0 + 1;
+    } else {
+        self.currentDetailPage = self.detailView.contentOffset.x/844.0;
+    }
+    if (self.currentDetailPage < self.detailPageCount - 1) {
+        CGPoint point = CGPointMake((self.currentDetailPage + 1) * 844.0, self.detailView.contentOffset.y);
+        [self.detailView setContentOffset:point animated:YES];
+        
+        for (int i = 0; i < self.detailPageCount; i++) {
+            UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + i];
+            [image setImage:[UIImage imageNamed:@"unselected"]];
+        }
+        UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + self.currentDetailPage + 1];
+        [image setImage:[UIImage imageNamed:@"selected"]];
+    }
 }
 
 -(void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index
