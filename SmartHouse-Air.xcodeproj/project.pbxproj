@@ -293,6 +293,7 @@
 		D87A67EB1818B24300F49363 /* state_2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D87A67E91818B24300F49363 /* state_2@2x.png */; };
 		D88260C2180D37390096C6CA /* icon1.png in Resources */ = {isa = PBXBuildFile; fileRef = D88260C0180D37390096C6CA /* icon1.png */; };
 		D88260C3180D37390096C6CA /* icon1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D88260C1180D37390096C6CA /* icon1@2x.png */; };
+		D8A5CA9B18C6525800C71446 /* SHConfigFile.m in Sources */ = {isa = PBXBuildFile; fileRef = D8A5CA9A18C6525800C71446 /* SHConfigFile.m */; };
 		D8B2F3AE188E57D500472E0B /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = D8B2F3AD188E57D500472E0B /* RegexKitLite.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		D8B2F3B0188E583C00472E0B /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D8B2F3AF188E583C00472E0B /* libicucore.dylib */; };
 		D8EEBD0D17BC7F8200200262 /* SHDetailContolView.m in Sources */ = {isa = PBXBuildFile; fileRef = D8EEBD0C17BC7F8200200262 /* SHDetailContolView.m */; };
@@ -602,6 +603,8 @@
 		D87A67E91818B24300F49363 /* state_2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "state_2@2x.png"; sourceTree = "<group>"; };
 		D88260C0180D37390096C6CA /* icon1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon1.png; sourceTree = SOURCE_ROOT; };
 		D88260C1180D37390096C6CA /* icon1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon1@2x.png"; sourceTree = SOURCE_ROOT; };
+		D8A5CA9918C6525800C71446 /* SHConfigFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHConfigFile.h; sourceTree = "<group>"; };
+		D8A5CA9A18C6525800C71446 /* SHConfigFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SHConfigFile.m; sourceTree = "<group>"; };
 		D8B2F3AC188E57D500472E0B /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		D8B2F3AD188E57D500472E0B /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
 		D8B2F3AF188E583C00472E0B /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/usr/lib/libicucore.dylib; sourceTree = DEVELOPER_DIR; };
@@ -699,6 +702,8 @@
 				D8F056F917BAC95500DF2928 /* SHSettingsViewController.m */,
 				D86B0D431819FD620098A755 /* SHSettingsNewViewController.h */,
 				D86B0D441819FD620098A755 /* SHSettingsNewViewController.m */,
+				D8A5CA9918C6525800C71446 /* SHConfigFile.h */,
+				D8A5CA9A18C6525800C71446 /* SHConfigFile.m */,
 				D816386E17BB0501008FAD0E /* SHReadConfigFile.h */,
 				D816386F17BB0501008FAD0E /* SHReadConfigFile.m */,
 				52E2297A17BBAA470086355A /* SHRoomModel.h */,
@@ -1373,6 +1378,7 @@
 				D80A186818C5C85800226C55 /* TFHpple.m in Sources */,
 				D8257DA818C16038009C01D0 /* SHCurtainControlView.m in Sources */,
 				D8EEBD0D17BC7F8200200262 /* SHDetailContolView.m in Sources */,
+				D8A5CA9B18C6525800C71446 /* SHConfigFile.m in Sources */,
 				D8F5BEB217BDD10000D3500A /* SHAirControlView.m in Sources */,
 				5214CB7817C068F500BDCEBC /* GCDAsyncSocket.m in Sources */,
 				D80A186A18C5C85800226C55 /* XPathQuery.m in Sources */,
