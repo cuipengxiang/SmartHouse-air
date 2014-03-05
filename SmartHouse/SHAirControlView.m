@@ -17,21 +17,34 @@
 
 @synthesize myModeThread;
 
-- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller
+- (id)initWithFrame:(CGRect)frame andModel:(SHAirConditioningModel *)model andController:(SHControlViewController *)controller
 {
     self = [self initWithFrame:frame];
     if (self) {
         self.myDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
         self.controller = controller;
+        self.model = model;
         UILabel *titleLabel = [[UILabel alloc] init];
-        [titleLabel setText:titleString];
+        [titleLabel setText:model.name];
         [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
         [titleLabel setBackgroundColor:[UIColor greenColor]];
         [titleLabel sizeToFit];
         [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 12.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
         [self addSubview:titleLabel];
+        
+        self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
+        self.isOnNow = 0;
+        NSString *savedtemp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
+        if (savedtemp) {
+            self.currentTemp = [savedtemp integerValue];
+        } else {
+            self.currentTemp = 20;
+        }
+        skip = NO;
+        
+        [self setDetailWithModel];
     }
     return self;
 }
@@ -40,28 +53,13 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        //UIImageView *background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-        //[background setImage:[UIImage imageNamed:@"bg_air"]];
-        //[self addSubview:background];
-        self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
-        self.isOnNow = 0;
-        NSString *savedtemp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", [self.airAddrs objectAtIndex:0], [self.airAddrs objectAtIndex:1]]];
-        if (savedtemp) {
-            self.currentTemp = [savedtemp integerValue];
-        } else {
-            self.currentTemp = 20;
-        }
-        skip = NO;
+
     }
     return self;
 }
 
-- (void)setAddrs:(NSMutableArray *)addrs andCmds:(NSMutableArray *)cmds andModes:(NSMutableArray *)modes
+- (void)setDetailWithModel
 {
-    self.airAddrs = addrs;
-    self.airCmds = cmds;
-    self.airModes = modes;
-    
     self.open_close = [[UIButton alloc] initWithFrame:CGRectMake(30.0, 64.0, 93.0, 33.0)];
     [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateNormal];
     [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateSelected];
@@ -73,12 +71,12 @@
     modeImage = [[UIImageView alloc] initWithFrame:CGRectMake(8.0, 9.5, 30.0, 55.0)];
     [modeImage setImage:[UIImage imageNamed:@"panel_title_mode"]];
     [modePanel addSubview:modeImage];
-    for (int i = 0; i < modes.count; i++) {
-        int location = [@"01234" rangeOfString:[modes objectAtIndex:i]].location;
+    for (int i = 0; i < self.model.modes.count; i++) {
+        int mode = [self checkMode:[self.model.modes objectAtIndex:i]];
         UIButton *modebutton = [[UIButton alloc] initWithFrame:CGRectMake(45.5 + 54.0 * i, 9.0, 46.0, 56.0)];
-        NSString *imageNameNormal = [NSString stringWithFormat:@"btn_mode_%d_normal", location];
-        NSString *imageNameSelected = [NSString stringWithFormat:@"btn_mode_%d_selected", location];
-        [modebutton setTag:MODE_BUTTON_BASE_TAG + location];
+        NSString *imageNameNormal = [NSString stringWithFormat:@"btn_mode_%d_normal", mode];
+        NSString *imageNameSelected = [NSString stringWithFormat:@"btn_mode_%d_selected", mode];
+        [modebutton setTag:MODE_BUTTON_BASE_TAG + mode];
         [modebutton setBackgroundImage:[UIImage imageNamed:imageNameNormal] forState:UIControlStateNormal];
         [modebutton setBackgroundImage:[UIImage imageNamed:imageNameSelected] forState:UIControlStateSelected];
         [modebutton addTarget:self action:@selector(onModeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -156,6 +154,23 @@
     }
 }
 
+- (int)checkMode:(NSString *)mode
+{
+    if ([mode isEqualToString:@"Wind"]) {
+        return 0;
+    } else if ([mode isEqualToString:@"Hot"]) {
+        return 1;
+    } else if ([mode isEqualToString:@"Cool"]) {
+        return 2;
+    } else if ([mode isEqualToString:@"Auto"]) {
+        return 3;
+    } else if ([mode isEqualToString:@"Wet"]) {
+        return 4;
+    } else {
+        return -1;
+    }
+}
+
 - (void)onCloseButtonClick:(UIButton *)button
 {
     skip = YES;
@@ -175,9 +190,10 @@
     skip = YES;
     self.currentMode = button.tag - MODE_BUTTON_BASE_TAG;
     [button setSelected:YES];
-    for (int i = 0; i < self.airModes.count; i++) {
-        if ([[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] tag] != button.tag) {
-            [(UIButton *)[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] setSelected:NO];
+    for (int i = 0; i < self.model.modes.count; i++) {
+        int tag = [self checkMode:[self.model.modes objectAtIndex:i]] + MODE_BUTTON_BASE_TAG;
+        if (tag != button.tag) {
+            [(UIButton *)[modePanel viewWithTag:tag] setSelected:NO];
         }
     }
 }
@@ -211,11 +227,11 @@
 - (void)onSettingButtonClick:(UIButton *)button
 {
     skip = YES;
-    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentTemp] forKey:[NSString stringWithFormat:@"air%@%@temp", [self.airAddrs objectAtIndex:0], [self.airAddrs objectAtIndex:1]]];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentTemp] forKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
         GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
-        NSString *command = [NSString stringWithFormat:@"%@ %@,%@,%d,%d,%d,%d,%d", [self.airCmds objectAtIndex:0], [self.airAddrs objectAtIndex:0], [self.airAddrs objectAtIndex:1], self.isOnNow, WIND_DIRECT, self.currentSpeed, self.currentMode, self.currentTemp];
+        NSString *command = [NSString stringWithFormat:@"*aircset %@,%@,%d,%d,%d,%d,%d", self.model.mainaddr, self.model.secondaryaddr, self.isOnNow, WIND_DIRECT, self.currentSpeed, self.currentMode, self.currentTemp];
         socket.command = [NSString stringWithFormat:@"%@\r\n", command];
         [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
     });
@@ -228,7 +244,7 @@
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
                 NSError *error;
                 GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-                socket.command = [NSString stringWithFormat:@"%@ %@,%@\r\n", [self.airCmds objectAtIndex:1], [self.airAddrs objectAtIndex:0], [self.airAddrs objectAtIndex:1]];
+                socket.command = [NSString stringWithFormat:@"aircreply %@,%@\r\n", self.model.mainaddr, self.model.secondaryaddr];
                 [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
             });
         } else {
@@ -286,9 +302,10 @@
         int tag = self.currentMode + MODE_BUTTON_BASE_TAG;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [(UIButton *)[modePanel viewWithTag:tag] setSelected:YES];
-            for (int i = 0; i < self.airModes.count; i++) {
-                if (tag != [[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] tag]) {
-                    [(UIButton *)[modePanel viewWithTag:[[self.airModes objectAtIndex:i] integerValue] + MODE_BUTTON_BASE_TAG] setSelected:NO];
+            for (int i = 0; i < self.model.modes.count; i++) {
+                int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]];
+                if (tag != buttonTag) {
+                    [(UIButton *)[modePanel viewWithTag:buttonTag] setSelected:NO];
                 }
             }
         });

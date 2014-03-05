@@ -10,6 +10,7 @@
 #import "GCDAsyncSocket.h"
 #import "AppDelegate.h"
 #import "SHControlViewController.h"
+#import "SHLightModel.h"
 
 @interface SHLightControlView : UIView<GCDAsyncSocketDelegate>
 
@@ -25,7 +26,7 @@
 @property (nonatomic, strong) UIView *BrightnessControl;
 @property (nonatomic, strong) UIImageView *BrightnessImage;
 
-- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller;
+- (id)initWithFrame:(CGRect)frame andModel:(SHLightModel *)model andController:(SHControlViewController *)controller;
 - (void)onSwitchButtonClick:(UIButton *)sender;
 - (void)onMoreButtonClick:(UIButton *)sender;
 - (void)onLessButtonClick:(UIButton *)sender;

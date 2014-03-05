@@ -21,7 +21,7 @@
     return self;
 }
 
-- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller
+- (id)initWithFrame:(CGRect)frame andModel:(SHCurtainModel *)model andController:(SHControlViewController *)controller
 {
     self = [self initWithFrame:frame];
     if (self) {
@@ -35,7 +35,7 @@
         [self addSubview:self.CurtainImage];
         
         UILabel *titleLabel = [[UILabel alloc] init];
-        [titleLabel setText:titleString];
+        [titleLabel setText:model.name];
         [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
         [titleLabel setBackgroundColor:[UIColor greenColor]];

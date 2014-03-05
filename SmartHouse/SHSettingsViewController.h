@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SHSettingsNewViewController.h"
 
 @interface SHSettingsViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate>
 

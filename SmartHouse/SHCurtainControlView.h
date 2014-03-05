@@ -10,6 +10,7 @@
 #import "GCDAsyncSocket.h"
 #import "AppDelegate.h"
 #import "SHControlViewController.h"
+#import "SHCurtainModel.h"
 
 @interface SHCurtainControlView : UIView<GCDAsyncSocketDelegate>
 
@@ -22,7 +23,7 @@
 @property (nonatomic, strong) UIButton *stopButton;
 @property (nonatomic, strong) UIImageView *CurtainImage;
 
-- (id)initWithFrame:(CGRect)frame andTitle:(NSString *)titleString andController:(SHControlViewController *)controller;
+- (id)initWithFrame:(CGRect)frame andModel:(SHCurtainModel *)model andController:(SHControlViewController *)controller;
 - (void)onOnButtonClick:(UIButton *)sender;
 - (void)onOffButtonClick:(UIButton *)sender;
 - (void)onStopButtonClick:(UIButton *)sender;

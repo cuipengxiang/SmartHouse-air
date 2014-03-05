@@ -8,6 +8,7 @@
 
 #import "SHControlViewController.h"
 #import "SHSettingsViewController.h"
+#import "SHModeModel.h"
 #import "SHLightControlView.h"
 #import "SHCurtainControlView.h"
 #import "SHSettingsViewController.h"
@@ -41,7 +42,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.needquery = YES;
     
     self.detailView = [[UIScrollView alloc] init];
     self.detailBackground = [[UIImageView alloc] init];
@@ -131,6 +131,69 @@
     */
 }
 
+- (int)checkCurrentTypeState:(SHRoomModel *)model
+{
+    int type = TYPE_MODE;
+    NSMutableArray *currentTypeState = [[NSMutableArray alloc] init];
+    if ((!self.currentModel.modes)||(self.currentModel.modes.count == 0)) {
+        [currentTypeState addObject:@"0"];
+        [self.ModeButton setHidden:YES];
+        type = TYPE_LIGHT;
+    } else {
+        [currentTypeState addObject:@"1"];
+        [self.ModeButton setHidden:NO];
+    }
+    if ((!self.currentModel.lights)||(self.currentModel.lights.count == 0)) {
+        [currentTypeState addObject:@"0"];
+        [self.LightButton setHidden:YES];
+        if (type == TYPE_LIGHT) {
+            type = TYPE_CURTAIN;
+        }
+    } else {
+        [currentTypeState addObject:@"1"];
+        [self.LightButton setHidden:NO];
+    }
+    if ((!self.currentModel.curtains)||(self.currentModel.curtains.count == 0)) {
+        [currentTypeState addObject:@"0"];
+        [self.CurtainButton setHidden:YES];
+        if (type == TYPE_CURTAIN) {
+            type = TYPE_AIR;
+        }
+    } else {
+        [currentTypeState addObject:@"1"];
+        [self.CurtainButton setHidden:NO];
+    }
+    if ((!self.currentModel.airconditionings)||(self.currentModel.airconditionings.count == 0)) {
+        [currentTypeState addObject:@"0"];
+        [self.AirButton setHidden:YES];
+        if (type == TYPE_AIR) {
+            type = -1;
+        }
+    } else {
+        [currentTypeState addObject:@"1"];
+        [self.AirButton setHidden:NO];
+    }
+    
+    if (!self.ModeButton.isHidden) {
+        [self.ModeButton setTag:0];
+        [self.ModeButton setFrame:CGRectMake(192.0f, 90.0f, 66.0f, 70.0f)];
+    }
+    if (!self.LightButton.isHidden) {
+        [self.LightButton setTag:[[currentTypeState objectAtIndex:0] integerValue]];
+        [self.LightButton setFrame:CGRectMake(192.0f + 100.0 * self.LightButton.tag, 90.0f, 66.0f, 70.0f)];
+    }
+    if (!self.CurtainButton.isHidden) {
+        [self.CurtainButton setTag:[[currentTypeState objectAtIndex:0] integerValue] + [[currentTypeState objectAtIndex:1] integerValue]];
+        [self.CurtainButton setFrame:CGRectMake(192.0f + 100.0 * self.CurtainButton.tag, 90.0f, 66.0f, 70.0f)];
+    }
+    if (!self.AirButton.isHidden) {
+        [self.AirButton setTag:[[currentTypeState objectAtIndex:0] integerValue] + [[currentTypeState objectAtIndex:1] integerValue] + [[currentTypeState objectAtIndex:2] integerValue]];
+        [self.AirButton setFrame:CGRectMake(192.0f + 100.0 * self.AirButton.tag, 90.0f, 66.0f, 70.0f)];
+    }
+    
+    return type;
+}
+
 //设置导航栏
 - (void)setupNavigationBar:(float)width
 {
@@ -181,7 +244,7 @@
 {
     [self.backController willAnimateRotationToInterfaceOrientation:[[UIApplication sharedApplication] statusBarOrientation] duration:1.0];
     [self dismissViewControllerAnimated:YES completion:^(void){
-        self.needquery = NO;
+        
     }];
 }
 
@@ -190,8 +253,31 @@
     SHSettingsViewController *controller = [[SHSettingsViewController alloc] initWithNibName:nil bundle:nil];
     controller.controller = self;
     [self presentViewController:controller animated:YES completion:^(void){
-        self.needquery = NO;
+        
     }];
+}
+
+- (void)setDetailViewScroll:(NSMutableArray *)detailViews;
+{
+    self.detailPageCount = detailViews.count;
+    self.currentDetailPage = 0;
+    [self.detailView setContentSize:CGSizeMake(844*detailViews.count, 553)];
+    if (detailViews.count > 1) {
+        [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViews.count*2-1)*15)/2.0, 675, (detailViews.count*2-1)*15, 44)];
+        for (int i = 0; i < detailViews.count; i++) {
+            UIImageView *image = [[UIImageView alloc] initWithFrame:CGRectMake(i*30, 14.5, 15, 15)];
+            if (i == 0) {
+                [image setImage:[UIImage imageNamed:@"selected"]];
+            } else {
+                [image setImage:[UIImage imageNamed:@"unselected"]];
+            }
+            [image setTag:GUIDE_PANEL_BASE_TAG + i];
+            [self.GuidePanel addSubview:image];
+        }
+        [self.GuidePanel setHidden:NO];
+        [self.leftButton setHidden:NO];
+        [self.rightButton setHidden:NO];
+    }
 }
 
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type AtIndex:(int)index
@@ -212,126 +298,69 @@
     [self.detailView setContentOffset:CGPointMake(0, 0)];
     [self.detailView setBackgroundColor:[UIColor clearColor]];
     
-    NSMutableArray *detailViewNames = nil;
-    NSMutableArray *detailViewBtns = nil;
-    NSMutableArray *detailViewCmds = nil;
-    NSMutableArray *airViewModes = nil;
-    NSMutableArray *airViewAddrs = nil;
     switch (type) {
         case TYPE_MODE:
-            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.modesNames];
-            detailViewBtns = [[NSMutableArray alloc] initWithArray:self.currentModel.modesNames];
-            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.modesCmds];
             if (index != 0) {
                 if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-                    [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_mode_l"]];
+                    [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_l_0"]];
                 } else {
-                    [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_mode_p"]];
+                    [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_p_0"]];
                 }
             }
             break;
         case TYPE_LIGHT:
-            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.lightNames];
-            detailViewBtns = [[NSMutableArray alloc] initWithArray:self.currentModel.lightBtns];
-            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.lightCmds];
             if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_light_l"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.LightButton.tag]]];
             } else {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_light_p"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.LightButton.tag]]];
             }
             break;
         case TYPE_CURTAIN:
-            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.curtainNames];
-            detailViewBtns = [[NSMutableArray alloc] initWithArray:self.currentModel.curtainBtns];
-            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.curtainCmds];
             if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_curtain_l"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.CurtainButton.tag]]];
             } else {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_curtain_p"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.CurtainButton.tag]]];
             }
             break;
         case TYPE_AIR:
-            detailViewNames = [[NSMutableArray alloc] initWithArray:self.currentModel.airNames];
-            detailViewCmds = [[NSMutableArray alloc] initWithArray:self.currentModel.airCmds];
-            airViewModes = [[NSMutableArray alloc] initWithArray:self.currentModel.airModes];
-            airViewAddrs = [[NSMutableArray alloc] initWithArray:self.currentModel.airAddrs];
             if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_air_l"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.AirButton.tag]]];
             } else {
-                [self.detailBackground setImage:[UIImage imageNamed:@"bg_detail_air_p"]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.AirButton.tag]]];
             }
             break;
     }
     [self.GuidePanel setHidden:YES];
     [self.leftButton setHidden:YES];
     [self.rightButton setHidden:YES];
-    if (type != TYPE_MODE) {
-        self.detailPageCount = detailViewNames.count;
-        self.currentDetailPage = 0;
-        [self.detailView setContentSize:CGSizeMake(844*detailViewNames.count, 553)];
-        if (detailViewNames.count > 1) {
-            [self.GuidePanel setFrame:CGRectMake(160+(844-(detailViewNames.count*2-1)*15)/2.0, 675, (detailViewNames.count*2-1)*15, 44)];
-            for (int i = 0; i < detailViewNames.count; i++) {
-                UIImageView *image = [[UIImageView alloc] initWithFrame:CGRectMake(i*30, 14.5, 15, 15)];
-                if (i == 0) {
-                    [image setImage:[UIImage imageNamed:@"selected"]];
-                } else {
-                    [image setImage:[UIImage imageNamed:@"unselected"]];
-                }
-                [image setTag:GUIDE_PANEL_BASE_TAG + i];
-                [self.GuidePanel addSubview:image];
-            }
-            [self.GuidePanel setHidden:NO];
-            [self.leftButton setHidden:NO];
-            [self.rightButton setHidden:NO];
-        }
-    }
+
     if (type == TYPE_LIGHT) {
+        [self setDetailViewScroll:self.currentModel.lights];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-            for (int i = 0; i < detailViewNames.count; i++) {
-                SHLightControlView *lightView = [[SHLightControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+            for (int i = 0; i < self.currentModel.lights.count; i++) {
+                SHLightControlView *lightView = [[SHLightControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andModel:[self.currentModel.lights objectAtIndex:i] andController:self];
                 [self.detailView addSubview:lightView];
-            }
-        } else {
-            int height = MAX(580, (150 * detailViewNames.count));
-            [self.detailView setContentSize:CGSizeMake(588, height)];
-            for (int i = 0; i < detailViewNames.count; i++) {
-                
             }
         }
     } else if (type == TYPE_CURTAIN) {
+        [self setDetailViewScroll:self.currentModel.curtains];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-            for (int i = 0; i < detailViewNames.count; i++) {
-                SHCurtainControlView *curtainView = [[SHCurtainControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andTitle:[detailViewNames objectAtIndex:i] andController:self];
+            for (int i = 0; i < self.currentModel.curtains.count; i++) {
+                SHCurtainControlView *curtainView = [[SHCurtainControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andModel:[self.currentModel.curtains objectAtIndex:i] andController:self];
                 [self.detailView addSubview:curtainView];
-            }
-        } else {
-            int height = MAX(580, (150 * detailViewNames.count));
-            [self.detailView setContentSize:CGSizeMake(588, height)];
-            for (int i = 0; i < detailViewNames.count; i++) {
-                
             }
         }
     } else if (type == TYPE_AIR) {
+        [self setDetailViewScroll:self.currentModel.airconditionings];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-            for (int i = 0; i < detailViewNames.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 45, 383, 490) andTitle:[detailViewNames objectAtIndex:i] andController:self];
-                [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
-                [self.detailView addSubview:detailViewPanel];
-            }
-        } else {
-            int height = MAX(580, (300 * detailViewNames.count));
-            [self.detailView setContentSize:CGSizeMake(588, height)];
-            for (int i = 0; i < detailViewNames.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(104, i*300, 380, 280) andTitle:[detailViewNames objectAtIndex:i] andController:self];
-                [detailViewPanel setAddrs:[airViewAddrs objectAtIndex:i] andCmds:[detailViewCmds objectAtIndex:i] andModes:[airViewModes objectAtIndex:i]];
+            for (int i = 0; i < self.currentModel.airconditionings.count; i++) {
+                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 45, 383, 490) andModel:[self.currentModel.airconditionings objectAtIndex:i] andController:self];
                 [self.detailView addSubview:detailViewPanel];
             }
         }
-
     } else if (type == TYPE_MODE) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-            for (int i = 0; i < detailViewNames.count; i++) {
+            for (int i = 0; i < self.currentModel.modes.count; i++) {
                 UIButton *button = [[UIButton alloc] init];
                 [button setFrame:CGRectMake(76.0 + 246.0 * (i % 3), 75.0 + 124.0 * (i / 3), 200.0, 74.0)];
                 //[button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateNormal];
@@ -354,14 +383,8 @@
 
 - (void)onModeButtonClick:(UIButton *)sender
 {
-    /*
-    for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count; i++) {
-        [(UIButton *)[self.detailView viewWithTag:i] setSelected:NO];
-    }
-    [sender setSelected:YES];
-    */
-    self.skipQuery = 1;
-    NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", [self.currentModel.modesCmds objectAtIndex:sender.tag - MODE_BTN_BASE_TAG]];
+    SHModeModel *modeModel = [self.currentModel.modes objectAtIndex:sender.tag - MODE_BTN_BASE_TAG];
+    NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", modeModel.modecmd];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
         GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
@@ -372,36 +395,8 @@
 
 - (void)setCurrentMode:(NSString *)mode
 {
-    if (self.currentType != TYPE_MODE) {
-        return;
-    }
-    //跳过点击按钮后的第一次查询
-    if (self.skipQuery == 1) {
-        self.skipQuery = 0;
-        return;
-    }
-    
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        int btn_tag = -1;
-        for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count; i++) {
-            int location = [mode rangeOfString:[self.currentModel.modeBacks objectAtIndex:i - MODE_BTN_BASE_TAG]].location;
-            
-            if (location == INT32_MAX) {
-                //[(UIButton *)[self.modeView viewWithTag:i] setSelected:NO];
-            } else {
-                //[(UIButton *)[self.modeView viewWithTag:i] setSelected:YES];
-                btn_tag = i;
-            }
-        }
-        if (btn_tag > 0) {
-            for (int i = MODE_BTN_BASE_TAG; i < MODE_BTN_BASE_TAG + self.currentModel.modesNames.count;i++) {
-                if (i == btn_tag) {
-                    [(UIButton *)[self.detailView viewWithTag:i] setSelected:YES];
-                } else {
-                    [(UIButton *)[self.detailView viewWithTag:i] setSelected:NO];
-                }
-            }
-        }
+        
     });
 }
 
@@ -472,6 +467,7 @@
 
 -(void)updateViews:(SHRoomModel *)currentModel atIndex:(int)index
 {
+    int type = TYPE_MODE;
     if (index == 0) {
         [self.LightButton setHidden:YES];
         [self.ModeButton setHidden:YES];
@@ -485,10 +481,7 @@
             
         }
     } else {
-        [self.LightButton setHidden:NO];
-        [self.ModeButton setHidden:NO];
-        [self.CurtainButton setHidden:NO];
-        [self.AirButton setHidden:NO];
+        type = [self checkCurrentTypeState:currentModel];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)){
             [self.detailView setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
@@ -496,7 +489,7 @@
             
         }
     }
-    [self setupDetailView:self.currentModel Type:TYPE_MODE AtIndex:index];
+    [self setupDetailView:self.currentModel Type:type AtIndex:index];
 }
 
 
@@ -562,10 +555,7 @@
 - (void)queryMode:(NSThread *)thread
 {
     while (YES) {
-        if (self.needquery) {
-            [self sendCommand:self.currentModel.queryCmd];
-            sleep(4);
-        }
+        
     }
 }
 
@@ -586,14 +576,11 @@
 }
 
 - (void)setViewFramesForOrientation:(UIInterfaceOrientation)orientation AtIndex:(int)index{
+    [self checkCurrentTypeState:self.currentModel];
     if (UIInterfaceOrientationIsLandscape(orientation)) {
         [self.navigationBar setFrame:CGRectMake(0, 0, 1024, 44)];
         [self.tableView setFrame:CGRectMake(0.0, 44.0, 140, 704)];
         [self.NetStateButton setFrame:CGRectMake(850.0, 64.0, 144.0, 36.0)];
-        [self.ModeButton setFrame:CGRectMake(192.0f, 90.0f, 66.0f, 70.0f)];
-        [self.LightButton setFrame:CGRectMake(292.0f, 90.0f, 66.0f, 70.0f)];
-        [self.CurtainButton setFrame:CGRectMake(392.0f, 90.0f, 66.0f, 70.0f)];
-        [self.AirButton setFrame:CGRectMake(492.0f, 90.0f, 66.0f, 70.0f)];
         [self.detailView setPagingEnabled:YES];
         [self.leftButton setFrame:CGRectMake(185.0, 431.0, 22.0, 41.0)];
         [self.rightButton setFrame:CGRectMake(957.0, 431.0, 22.0, 41.0)];

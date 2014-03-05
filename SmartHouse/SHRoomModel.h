@@ -10,21 +10,13 @@
 
 @interface SHRoomModel : NSObject
 
+@property (nonatomic,strong)NSString *roomid;
 @property (nonatomic,strong)NSString *name;
-@property (nonatomic,strong)NSString *queryCmd;
-@property (nonatomic,strong)NSMutableArray *modeBacks;
-@property (nonatomic,strong)NSMutableArray *modesNames;
-@property (nonatomic,strong)NSMutableArray *modesCmds;
-@property (nonatomic,strong)NSMutableArray *lightNames;
-@property (nonatomic,strong)NSMutableArray *lightBtns;
-@property (nonatomic,strong)NSMutableArray *lightCmds;
-@property (nonatomic,strong)NSMutableArray *curtainNames;
-@property (nonatomic,strong)NSMutableArray *curtainBtns;
-@property (nonatomic,strong)NSMutableArray *curtainCmds;
-@property (nonatomic,strong)NSMutableArray *airNames;
-@property (nonatomic,strong)NSMutableArray *airModes;
-@property (nonatomic,strong)NSMutableArray *airCmds;
-@property (nonatomic,strong)NSMutableArray *airAddrs;
+@property (nonatomic,strong)NSMutableArray *modes;
+@property (nonatomic,strong)NSMutableArray *lights;
+@property (nonatomic,strong)NSMutableArray *curtains;
+@property (nonatomic,strong)NSMutableArray *airconditionings;
 
+- (id)init;
 
 @end

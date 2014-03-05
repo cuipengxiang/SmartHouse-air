@@ -15,20 +15,10 @@
     self = [super init];
     if (self) {
         self.name = [[NSString alloc] init];
-        self.queryCmd = [[NSString alloc] init];
-        self.modeBacks = [[NSMutableArray alloc] init];
-        self.modesNames = [[NSMutableArray alloc] init];
-        self.modesCmds = [[NSMutableArray alloc] init];
-        self.lightNames = [[NSMutableArray alloc] init];
-        self.lightBtns = [[NSMutableArray alloc] init];
-        self.lightCmds = [[NSMutableArray alloc] init];
-        self.curtainNames = [[NSMutableArray alloc] init];
-        self.curtainBtns = [[NSMutableArray alloc] init];
-        self.curtainCmds = [[NSMutableArray alloc] init];
-        self.airNames = [[NSMutableArray alloc] init];
-        self.airModes = [[NSMutableArray alloc] init];
-        self.airCmds = [[NSMutableArray alloc] init];
-        self.airAddrs = [[NSMutableArray alloc] init];
+        self.modes = [[NSMutableArray alloc] init];
+        self.lights = [[NSMutableArray alloc] init];
+        self.curtains = [[NSMutableArray alloc] init];
+        self.airconditionings = [[NSMutableArray alloc] init];
     }
     return self;
 }

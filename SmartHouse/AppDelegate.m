@@ -8,9 +8,8 @@
 
 #import "AppDelegate.h"
 #import "SHLoginViewController.h"
-#import "SHReadConfigFile.h"
 #import "SHControlViewController.h"
-
+#import "SHConfigFile.h"
 
 @implementation AppDelegate
 
@@ -23,9 +22,8 @@
     self.viewController = [[SHLoginViewController alloc] initWithNibName:nil bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    SHReadConfigFile *fileReader = [[SHReadConfigFile alloc] init];
-    [fileReader readFile];
-    
+    SHConfigFile *file = [[SHConfigFile alloc] init];
+    [file readFile];
     //初始化Socket连接
     self.socketQueue = dispatch_queue_create("socketQueue", NULL);
 

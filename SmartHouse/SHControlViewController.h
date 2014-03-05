@@ -44,9 +44,6 @@
 @property(nonatomic)int detailPageCount;
 @property(nonatomic)int currentDetailPage;
 
-@property BOOL needquery;
-@property int skipQuery;
-
 - (void)setViewFramesForOrientation:(UIInterfaceOrientation)orientation AtIndex:(int)index;
 - (void)setupNavigationBar:(float)width;
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type AtIndex:(int)index;
@@ -68,5 +65,9 @@
 
 - (void)onLeftButtonClick:(UIButton *)sender;
 - (void)onRightButtonClick:(UIButton *)sender;
+
+- (void)setDetailViewScroll:(NSMutableArray *)detailViews;
+
+- (int)checkCurrentTypeState:(SHRoomModel *)model;
 
 @end
