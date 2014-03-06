@@ -65,7 +65,7 @@
 
 - (void)setNetworkState:(BOOL)state;
 - (void)onModeButtonClick:(UIButton *)sender;
-- (void)onModeButtonLongPressed:(UIButton *)sender;
+- (void)onModeButtonLongPressed:(UILongPressGestureRecognizer *)gestureRecognizer;
 
 - (void)onLeftButtonClick:(UIButton *)sender;
 - (void)onRightButtonClick:(UIButton *)sender;

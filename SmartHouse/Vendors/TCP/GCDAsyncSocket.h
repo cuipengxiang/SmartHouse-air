@@ -95,7 +95,7 @@ typedef enum GCDAsyncSocketError GCDAsyncSocketError;
 
 @interface GCDAsyncSocket : NSObject
 
-
+@property id data;
 @property NSString *command;
 @property int type;
 @property int skip;
