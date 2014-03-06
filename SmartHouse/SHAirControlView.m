@@ -326,6 +326,11 @@
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
+    if (err) {
+        [self.controller setNetworkState:NO];
+    } else {
+        [self.controller setNetworkState:YES];
+    }
     sock = nil;
 }
 
