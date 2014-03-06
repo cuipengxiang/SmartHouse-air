@@ -73,9 +73,6 @@
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
-    NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
-    [(SHControlViewController *)self.mainController setCurrentMode:msg];
     [sock disconnect];
 }
 
@@ -87,16 +84,5 @@
         [(SHControlViewController *)self.mainController setNetworkState:YES];
     }
 }
-
-- (void)sendCommand:(NSString *)command from:(UIViewController *)controller
-{
-    NSError *error = nil;
-    self.mainController = controller;
-    NSString *commandSend = [NSString stringWithFormat:@"%@\r\n",command];
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-    socket.command = commandSend;
-    [socket connectToHost:self.host onPort:self.port withTimeout:3.0 error:&error];
-}
-
 
 @end

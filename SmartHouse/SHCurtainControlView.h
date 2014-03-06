@@ -27,6 +27,7 @@
 @property (nonatomic, strong) UIImageView *CurtainImage;
 //@property (nonatomic, strong) NSThread *myModeThread;
 @property (nonatomic, strong) SHCurtainModel *model;
+@property (nonatomic)int state;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHCurtainModel *)model andController:(SHControlViewController *)controller;
 - (void)onOnButtonClick:(UIButton *)sender;

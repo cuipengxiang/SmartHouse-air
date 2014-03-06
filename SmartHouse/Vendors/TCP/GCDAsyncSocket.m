@@ -1109,7 +1109,8 @@ enum GCDAsyncSocketConfig
 		preBuffer = [[GCDAsyncSocketPreBuffer alloc] initWithCapacity:(1024 * 4)];
         
         self.command = [[NSString alloc] init];
-        self.command1 = [[NSString alloc] init];
+        self.skip = -1;
+        self.type = -1;
 	}
 	return self;
 }

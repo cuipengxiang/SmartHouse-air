@@ -13,6 +13,7 @@
 #import "SHCurtainControlView.h"
 #import "SHSettingsViewController.h"
 #import "SHAirControlView.h"
+#import "RegexKitLite.h"
 
 #define GUIDE_PANEL_BASE_TAG 2000
 #define MODE_BTN_BASE_TAG 1000
@@ -356,24 +357,32 @@
         [self setDetailViewScroll:self.currentModel.airconditionings];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < self.currentModel.airconditionings.count; i++) {
-                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 45, 383, 490) andModel:[self.currentModel.airconditionings objectAtIndex:i] andController:self];
+                SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 25.0, 383, 500) andModel:[self.currentModel.airconditionings objectAtIndex:i] andController:self];
                 [self.detailView addSubview:detailViewPanel];
             }
         }
     } else if (type == TYPE_MODE) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             [self.detailView setContentSize:CGSizeMake(844.0, 553.0)];
-            for (int i = 0; i < self.currentModel.modes.count; i++) {
+            for (int i = 0; i <= self.currentModel.modes.count; i++) {
                 UIButton *button = [[UIButton alloc] init];
                 [button setFrame:CGRectMake(76.0 + 246.0 * (i % 3), 75.0 + 124.0 * (i / 3), 200.0, 74.0)];
                 //[button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateNormal];
                 //[button setTitle:[self.currentModel.modesNames objectAtIndex:i] forState:UIControlStateSelected];
                 //[button setTitleEdgeInsets:UIEdgeInsetsMake(0, 30, 0, 0)];
-                [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_normal%d", i]] forState:UIControlStateNormal];
-                [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_selected%d", i]] forState:UIControlStateHighlighted];
+                if (i == self.currentModel.modes.count) {
+                    [button setBackgroundImage:[UIImage imageNamed:@"mode_normal_userdefine"] forState:UIControlStateNormal];
+                    [button setBackgroundImage:[UIImage imageNamed:@"mode_selected_userdefine"] forState:UIControlStateHighlighted];
+                    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(onModeButtonLongPressed:)];
+                    longPress.minimumPressDuration = 1.5; //定义按的时间
+                    [button addGestureRecognizer:longPress];
+                } else {
+                    [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_normal%d", i]] forState:UIControlStateNormal];
+                    [button setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"mode_selected%d", i]] forState:UIControlStateHighlighted];
+                }
+                [button setTag:MODE_BTN_BASE_TAG + i];
                 [button setTitleColor:[UIColor blackColor] forState:UIControlStateSelected];
                 [button setTitleColor:[UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1.0] forState:UIControlStateNormal];
-                [button setTag:MODE_BTN_BASE_TAG + i];
                 [button addTarget:self action:@selector(onModeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
                 [self.detailView addSubview:button];
             }
@@ -386,21 +395,80 @@
 
 - (void)onModeButtonClick:(UIButton *)sender
 {
-    SHModeModel *modeModel = [self.currentModel.modes objectAtIndex:sender.tag - MODE_BTN_BASE_TAG];
-    NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", modeModel.modecmd];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-        NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-        socket.command = commandSend;
-        [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
-    });
+    if (sender.tag < self.currentModel.modes.count + MODE_BTN_BASE_TAG) {
+        SHModeModel *modeModel = [self.currentModel.modes objectAtIndex:sender.tag - MODE_BTN_BASE_TAG];
+        NSString *commandSend = [NSString stringWithFormat:@"%@\r\n", modeModel.modecmd];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+            NSError *error;
+            GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+            socket.command = commandSend;
+            [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
+        });
+    } else {
+        NSString *modeDefine = [[NSUserDefaults standardUserDefaults] objectForKey:@"mode_user_define"];
+        if (modeDefine) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+                NSError *error;
+                GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+                socket.command = modeDefine;
+                [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
+            });
+        } else {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"自定模式提醒" message:@"您尚未录入自定模式，是否保存家电当前状态为自定模式？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+            [alert show];
+        }
+    }
 }
 
-- (void)setCurrentMode:(NSString *)mode
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        
-    });
+    if (buttonIndex == 1) {
+        [self saveUserDefineMode];
+    }
+}
+
+- (void)saveUserDefineMode
+{
+    self.defineModeCmd = [[NSMutableArray alloc] init];
+    for (int i = 0; i < self.currentModel.lights.count; i++) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+            SHLightModel *lightmodel = [self.currentModel.lights objectAtIndex:i];
+            NSError *error;
+            GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+            socket.type = TYPE_LIGHT;
+            socket.command = [NSString stringWithFormat:@"*requestchannellevel %@,%@\r\n", [lightmodel channel], [lightmodel area]];
+            [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
+        });
+    }
+    for (int i = 0; i < self.currentModel.curtains.count; i++) {
+        SHCurtainModel *curtainmodel = [self.currentModel.airconditionings objectAtIndex:i];
+        NSString *stateString = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"curtain%@%@", curtainmodel.channel, curtainmodel.area]];
+        if (stateString) {
+            int state = [stateString integerValue];
+            if (state == 0) {
+                [self.defineModeCmd addObject:curtainmodel.closecmd];
+            } else {
+                [self.defineModeCmd addObject:curtainmodel.opencmd];
+            }
+        } else {
+            [self.defineModeCmd addObject:curtainmodel.closecmd];
+        }
+    }
+    for (int i = 0; i < self.currentModel.airconditionings.count; i++) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+            SHAirConditioningModel *airmodel = [self.currentModel.airconditionings objectAtIndex:i];
+            NSError *error;
+            GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+            socket.type = TYPE_AIR;
+            socket.command = [NSString stringWithFormat:@"aircreply %@,%@\r\n", [airmodel mainaddr], [airmodel secondaryaddr]];
+            [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
+        });
+    }
+}
+
+- (void)onModeButtonLongPressed:(UIButton *)sender
+{
+    [self saveUserDefineMode];
 }
 
 - (void)onLightClick:(id)sender
@@ -569,11 +637,6 @@
     }
 }
 
-- (void)sendCommand:(NSString *)cmd;
-{
-    [self.myAppDelegate sendCommand:cmd from:self];
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
     if ((toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft)||(toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)) {
         return YES;
@@ -648,14 +711,47 @@
 
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {
-    [sock writeData:[sock.command dataUsingEncoding:NSUTF8StringEncoding] withTimeout:3 tag:0];
+    [sock writeData:[sock.command dataUsingEncoding:NSUTF8StringEncoding] withTimeout:3.0 tag:0];
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
     [sock readDataToData:[GCDAsyncSocket CRLFData] withTimeout:1 tag:0];
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+    NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+    
+    if (sock.type == TYPE_LIGHT) {
+        NSArray *arrayTemp = [msg arrayOfCaptureComponentsMatchedByRegex:@"T\\[(.+?)\\]"];
+        NSArray *arrayChannel = [msg arrayOfCaptureComponentsMatchedByRegex:@"T\\[(.+?)\\]"];
+        NSArray *arrayArea = [msg arrayOfCaptureComponentsMatchedByRegex:@"T\\[(.+?)\\]"];;
+        if ((arrayTemp)&&(arrayTemp.count > 0)) {
+            int brightness = [[[arrayTemp objectAtIndex:0] objectAtIndex:1] integerValue];
+            
+        }
+    }
+    
     [sock disconnect];
+}
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+{
+    if (err) {
+        [self setNetworkState:NO];
+    } else {
+        [self setNetworkState:YES];
+    }
     sock = nil;
 }
+
+- (NSTimeInterval)socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    [sock disconnect];
+    return 0.0;
+}
+
 
 @end

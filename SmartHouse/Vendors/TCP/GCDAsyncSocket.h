@@ -97,7 +97,8 @@ typedef enum GCDAsyncSocketError GCDAsyncSocketError;
 
 
 @property NSString *command;
-@property NSString *command1;
+@property int type;
+@property int skip;
 /**
  * GCDAsyncSocket uses the standard delegate paradigm,
  * but executes all delegate callbacks on a given delegate dispatch queue.

@@ -27,11 +27,11 @@
         self.model = model;
         UILabel *titleLabel = [[UILabel alloc] init];
         [titleLabel setText:model.name];
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
+        [titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
-        [titleLabel setBackgroundColor:[UIColor greenColor]];
-        [titleLabel sizeToFit];
-        [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 12.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
+        [titleLabel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"title_bg"]]];
+        [titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
         
         self.socketQueue = dispatch_queue_create("socketQueue4", NULL);
@@ -60,13 +60,13 @@
 
 - (void)setDetailWithModel
 {
-    self.open_close = [[UIButton alloc] initWithFrame:CGRectMake(30.0, 64.0, 93.0, 33.0)];
+    self.open_close = [[UIButton alloc] initWithFrame:CGRectMake(30.0, 84.0, 93.0, 33.0)];
     [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateNormal];
     [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateSelected];
     [self.open_close addTarget:self action:@selector(onCloseButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.open_close];
     
-    modePanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 115.0, 325.0, 74.0)];
+    modePanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 135.0, 325.0, 74.0)];
     [modePanel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"air_panel_bg"]]];
     modeImage = [[UIImageView alloc] initWithFrame:CGRectMake(8.0, 9.5, 30.0, 55.0)];
     [modeImage setImage:[UIImage imageNamed:@"panel_title_mode"]];
@@ -84,7 +84,7 @@
     }
     [self addSubview:modePanel];
     
-    speedPanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 210.0, 325.0, 74.0)];
+    speedPanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 230.0, 325.0, 74.0)];
     [speedPanel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"air_panel_bg"]]];
     speedImage = [[UIImageView alloc] initWithFrame:CGRectMake(8.0, 9, 31.0, 56.0)];
     [speedImage setImage:[UIImage imageNamed:@"panel_title_speed"]];
@@ -101,7 +101,7 @@
     }
     [self addSubview:speedPanel];
     
-    tempPanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 305.0, 325.0, 74.0)];
+    tempPanel = [[UIView alloc] initWithFrame:CGRectMake(29.0, 325.0, 325.0, 74.0)];
     [tempPanel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"air_panel_temp_bg"]]];
     self.tempLower = [[UIButton alloc] initWithFrame:CGRectMake(0.0, 2.0, 75.0, 70.0)];
     [self.tempLower setBackgroundImage:[UIImage imageNamed:@"btn_lower_normal"] forState:UIControlStateNormal];
@@ -143,7 +143,7 @@
     [tempPanel addSubview:tempsysbol];
     [self addSubview:tempPanel];
     
-    self.settingButton = [[UIButton alloc] initWithFrame:CGRectMake(256.0, 405.0, 97.0, 38.0)];
+    self.settingButton = [[UIButton alloc] initWithFrame:CGRectMake(256.0, 425.0, 97.0, 38.0)];
     [self.settingButton setBackgroundImage:[UIImage imageNamed:@"btn_air_set_normal"] forState:UIControlStateNormal];
     [self.settingButton setBackgroundImage:[UIImage imageNamed:@"btn_air_set_pressed"] forState:UIControlStateHighlighted];
     [self.settingButton addTarget:self action:@selector(onSettingButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -267,13 +267,18 @@
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
+    if (sock.skip == -1) {
+        sock.skip = 0;
+        [sock readDataToData:[GCDAsyncSocket CRLFData] withTimeout:1 tag:0];
+        return;
+    }
     NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
     NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
     NSArray *arrayState = [msg arrayOfCaptureComponentsMatchedByRegex:@"State\\[(.+?)\\]"];
     NSArray *arrayMode = [msg arrayOfCaptureComponentsMatchedByRegex:@"Mode\\[(.+?)\\]"];
     NSArray *arraySpeed = [msg arrayOfCaptureComponentsMatchedByRegex:@"Size\\[(.+?)\\]"];
     NSArray *arrayTemp = [msg arrayOfCaptureComponentsMatchedByRegex:@"Temp\\[(.+?)\\]"];
-    if (arrayState) {
+    if ((arrayState)&&(arrayState.count > 0)) {
         self.isOnNow = [[[arrayState objectAtIndex:0] objectAtIndex:1] integerValue];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (self.isOnNow == 1) {
@@ -285,7 +290,7 @@
             }
         });
     }
-    if (arraySpeed) {
+    if ((arraySpeed)&&(arraySpeed.count > 0)) {
         self.currentSpeed = [[[arraySpeed objectAtIndex:0] objectAtIndex:1] integerValue];
         int tag = self.currentSpeed + SPEED_BUTTON_BASE_TAG;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -297,7 +302,7 @@
             }
         });
     }
-    if (arrayMode) {
+    if ((arrayMode)&&(arrayMode.count > 0)) {
         self.currentMode = [[[arrayMode objectAtIndex:0] objectAtIndex:1] integerValue];
         int tag = self.currentMode + MODE_BUTTON_BASE_TAG;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -310,7 +315,7 @@
             }
         });
     }
-    if (arrayTemp) {
+    if ((arrayTemp)&&(arrayTemp.count > 0)) {
         self.currentTemp = [[[arrayTemp objectAtIndex:0] objectAtIndex:1] integerValue];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [temp_big setText:[NSString stringWithFormat:@"%d", self.currentTemp]];

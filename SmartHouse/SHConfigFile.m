@@ -87,6 +87,7 @@
             lightModel.area = [[lightElement attributes] objectForKey:@"area"];
             lightModel.channel = [[lightElement attributes] objectForKey:@"channel"];
             [roomModel.lights addObject:lightModel];
+            [wholeHouse.lights addObject:lightModel];
         }
         
         NSArray *curtains = [roomElement searchWithXPathQuery:@"//Curtain"];
@@ -101,6 +102,7 @@
             curtainModel.closecmd = [[curtainElement attributes] objectForKey:@"closecmd"];
             curtainModel.stopcmd = [[curtainElement attributes] objectForKey:@"stopcmd"];
             [roomModel.curtains addObject:curtainModel];
+            [wholeHouse.curtains addObject:curtainModel];
         }
         
         NSArray *airconditionings = [roomElement searchWithXPathQuery:@"//Air_conditioning"];
@@ -113,6 +115,7 @@
             airconditioningModel.secondaryaddr = [[airconditioningElement attributes] objectForKey:@"secondaryaddr"];
             airconditioningModel.modes = [(NSString *)[[airconditioningElement attributes] objectForKey:@"modes"] componentsSeparatedByString:@"|"];
             [roomModel.airconditionings addObject:airconditioningModel];
+            [wholeHouse.airconditionings addObject:airconditioningModel];
         }
         
         [myDelegate.models addObject:roomModel];

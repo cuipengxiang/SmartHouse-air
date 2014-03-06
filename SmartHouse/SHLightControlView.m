@@ -45,9 +45,10 @@
         
         UILabel *titleLabel = [[UILabel alloc] init];
         [titleLabel setText:model.name];
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
+        [titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
         [titleLabel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"title_bg"]]];
+        [titleLabel setTextAlignment:NSTextAlignmentCenter];
         [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
         
@@ -117,7 +118,7 @@
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myDelegate delegateQueue:self.myDelegate.socketQueue];
         NSString *command = [NSString stringWithFormat:@"*channellevel %@,%d,%@,%@", self.model.channel, self.Brightness*10, self.model.area, self.model.fade];
         socket.command = [NSString stringWithFormat:@"%@\r\n", command];
         [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
@@ -175,11 +176,16 @@
 
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
+    if (sock.skip == -1) {
+        sock.skip = 0;
+        [sock readDataToData:[GCDAsyncSocket CRLFData] withTimeout:1 tag:0];
+        return;
+    }
     NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
     NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
     
     NSArray *arrayTemp = [msg arrayOfCaptureComponentsMatchedByRegex:@"T\\[(.+?)\\]"];
-    if (arrayTemp) {
+    if ((arrayTemp)&&(arrayTemp.count > 0)) {
         int brightness = [[[arrayTemp objectAtIndex:0] objectAtIndex:1] integerValue]/10;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self setBrightnessDegree:brightness];

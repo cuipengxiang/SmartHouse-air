@@ -33,14 +33,26 @@
         [self setBackgroundColor:[UIColor clearColor]];
         self.model = model;
         self.CurtainImage = [[UIImageView alloc] initWithFrame:CGRectMake(53.0, 130.0, 494.0, 258.0)];
-        [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_closed"]];
+        NSString *curtainState = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"curtain%@%@", self.model.channel,self.model.area]];
+        if (curtainState) {
+            self.state = [curtainState integerValue];
+            if (self.state == 0) {
+                [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_closed"]];
+            } else {
+                [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_open"]];
+            }
+        } else {
+            [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:[NSString stringWithFormat:@"curtain%@%@", self.model.channel,self.model.area]];
+            [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_closed"]];
+        }
         [self addSubview:self.CurtainImage];
         
         UILabel *titleLabel = [[UILabel alloc] init];
         [titleLabel setText:model.name];
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
+        [titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
         [titleLabel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"title_bg"]]];
+        [titleLabel setTextAlignment:NSTextAlignmentCenter];
         [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
         
@@ -68,9 +80,11 @@
 
 - (void)onOnButtonClick:(UIButton *)sender
 {
+    [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:[NSString stringWithFormat:@"curtain%@%@", self.model.channel,self.model.area]];
+    [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_open"]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myDelegate delegateQueue:self.myDelegate.socketQueue];
         socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.opencmd];
         [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
     });
@@ -78,9 +92,11 @@
 
 - (void)onOffButtonClick:(UIButton *)sender
 {
+    [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:[NSString stringWithFormat:@"curtain%@%@", self.model.channel,self.model.area]];
+    [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_closed"]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myDelegate delegateQueue:self.myDelegate.socketQueue];
         socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.closecmd];
         [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
     });
@@ -90,7 +106,7 @@
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
-        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myDelegate delegateQueue:self.myDelegate.socketQueue];
         socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.stopcmd];
         [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
     });

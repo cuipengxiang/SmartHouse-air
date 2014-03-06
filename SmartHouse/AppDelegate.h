@@ -22,6 +22,4 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) SHLoginViewController *viewController;
 
-- (void)sendCommand:(NSString *)command from:(UIViewController *)controller;
-
 @end

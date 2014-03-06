@@ -12,7 +12,7 @@
 #import "SHLoginViewController.h"
 #import "GCDAsyncSocket.h"
 
-@interface SHControlViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,GCDAsyncSocketDelegate>
+@interface SHControlViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,UIAlertViewDelegate,GCDAsyncSocketDelegate>
 
 {
     UIImageView *firstImageView;
@@ -47,6 +47,8 @@
 @property(nonatomic)int detailPageCount;
 @property(nonatomic)int currentDetailPage;
 
+@property(nonatomic, strong)NSMutableArray *defineModeCmd;
+
 - (void)setViewFramesForOrientation:(UIInterfaceOrientation)orientation AtIndex:(int)index;
 - (void)setupNavigationBar:(float)width;
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type AtIndex:(int)index;
@@ -61,10 +63,9 @@
 - (void)onAirClick:(id)sender;
 - (void)onNetStateButtonClick:(id)sender;
 
-- (void)sendCommand:(NSString *)cmd;
 - (void)setNetworkState:(BOOL)state;
 - (void)onModeButtonClick:(UIButton *)sender;
-- (void)setCurrentMode:(NSString *)mode;
+- (void)onModeButtonLongPressed:(UIButton *)sender;
 
 - (void)onLeftButtonClick:(UIButton *)sender;
 - (void)onRightButtonClick:(UIButton *)sender;
@@ -73,5 +74,6 @@
 
 - (int)checkCurrentTypeState:(SHRoomModel *)model;
 - (void)queryMode:(NSThread *)thread;
+- (void)saveUserDefineMode;
 
 @end
