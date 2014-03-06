@@ -52,5 +52,6 @@
 - (void)onModeButtonClick:(UIButton *)button;
 - (void)onSpeedButtonClick:(UIButton *)button;
 - (int)checkMode:(NSString *)mode;
+- (void)queryMode:(NSThread *)thread;
 
 @end

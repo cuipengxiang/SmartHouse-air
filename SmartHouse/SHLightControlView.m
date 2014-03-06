@@ -7,6 +7,7 @@
 //
 
 #import "SHLightControlView.h"
+#import "RegexKitLite.h"
 
 #define BRIGHTNESS_DEGREE_BASE_TAG 3000
 
@@ -16,7 +17,9 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
+        self.socketQueue = dispatch_queue_create("socketQueue2", NULL);
+        self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
+        skip = NO;
     }
     return self;
 }
@@ -26,11 +29,10 @@
     self = [self initWithFrame:frame];
     if (self) {
         self.myDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        //self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
         self.controller = controller;
         [self setBackgroundColor:[UIColor clearColor]];
         self.Brightness = 0;
-        
+        self.model = model;
         self.on_off = [[UIButton alloc] initWithFrame:CGRectMake(40.0, 400.0, 139.0, 48.0)];
         self.isNowOn = NO;
         [self.on_off setImage:[UIImage imageNamed:@"switch_btn_off"] forState:UIControlStateNormal];
@@ -45,9 +47,8 @@
         [titleLabel setText:model.name];
         [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
-        [titleLabel setBackgroundColor:[UIColor greenColor]];
-        [titleLabel sizeToFit];
-        [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 31.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
+        [titleLabel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"title_bg"]]];
+        [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
         
         self.BrightnessControl = [[UIView alloc] initWithFrame:CGRectMake(210.0, 400.0, 350.0, 48.0)];
@@ -72,7 +73,11 @@
             [self.BrightnessControl addSubview:imageView];
         }
         
-        [self setBrightnessDegree:2];
+        [self setBrightnessDegree:0];
+        
+        if (![self.myModeThread isExecuting]) {
+            [self.myModeThread start];
+        }
     }
     return self;
 }
@@ -84,6 +89,7 @@
     } else {
         [self setBrightnessDegree:10];
     }
+    [self sendCommand];
 }
 
 - (void)setBrightnessDegree:(int)degree
@@ -107,10 +113,22 @@
     [self.BrightnessImage setImage:[UIImage imageNamed:[NSString stringWithFormat:@"lightball_lv%d", self.Brightness]]];
 }
 
+- (void)sendCommand
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+        NSError *error;
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        NSString *command = [NSString stringWithFormat:@"*channellevel %@,%d,%@,%@", self.model.channel, self.Brightness*10, self.model.area, self.model.fade];
+        socket.command = [NSString stringWithFormat:@"%@\r\n", command];
+        [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+    });
+}
+
 - (void)onMoreButtonClick:(UIButton *)sender
 {
     if (self.Brightness < 10) {
         [self setBrightnessDegree:self.Brightness + 1];
+        [self sendCommand];
     } else {
         return;
     }
@@ -120,9 +138,76 @@
 {
     if (self.Brightness > 0) {
         [self setBrightnessDegree:self.Brightness - 1];
+        [self sendCommand];
     } else {
         return;
     }
+}
+
+- (void)queryMode:(NSThread *)thread
+{
+    while ([[NSThread currentThread] isCancelled] == NO) {
+        if (!skip) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+                NSError *error;
+                GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+                socket.command = [NSString stringWithFormat:@"*requestchannellevel %@,%@\r\n", self.model.channel, self.model.area];
+                [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+            });
+        } else {
+            skip = NO;
+        }
+        sleep(4);
+    }
+    [NSThread exit];
+}
+
+
+- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+{
+    [sock writeData:[sock.command dataUsingEncoding:NSUTF8StringEncoding] withTimeout:3.0 tag:0];
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+{
+    [sock readDataToData:[GCDAsyncSocket CRLFData] withTimeout:1 tag:0];
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+    NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+    
+    NSArray *arrayTemp = [msg arrayOfCaptureComponentsMatchedByRegex:@"T\\[(.+?)\\]"];
+    if (arrayTemp) {
+        int brightness = [[[arrayTemp objectAtIndex:0] objectAtIndex:1] integerValue]/10;
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self setBrightnessDegree:brightness];
+        });
+    }
+    [sock disconnect];
+}
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+{
+    if (err) {
+        [self.controller setNetworkState:NO];
+    } else {
+        [self.controller setNetworkState:YES];
+    }
+    sock = nil;
+}
+
+- (NSTimeInterval)socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    [sock disconnect];
+    return 0.0;
+}
+
+- (void)removeFromSuperview
+{
+    [self.myModeThread cancel];
+    [super removeFromSuperview];
 }
 
 /*

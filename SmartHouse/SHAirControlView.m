@@ -34,7 +34,7 @@
         [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 12.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
         [self addSubview:titleLabel];
         
-        self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
+        self.socketQueue = dispatch_queue_create("socketQueue4", NULL);
         self.isOnNow = 0;
         NSString *savedtemp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
         if (savedtemp) {

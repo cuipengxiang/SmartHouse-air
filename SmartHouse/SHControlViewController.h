@@ -14,6 +14,9 @@
 
 @interface SHControlViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,GCDAsyncSocketDelegate>
 
+{
+    UIImageView *firstImageView;
+}
 
 @property(nonatomic)dispatch_queue_t socketQueue;
 @property(nonatomic, strong)AppDelegate *myAppDelegate;
@@ -69,5 +72,6 @@
 - (void)setDetailViewScroll:(NSMutableArray *)detailViews;
 
 - (int)checkCurrentTypeState:(SHRoomModel *)model;
+- (void)queryMode:(NSThread *)thread;
 
 @end

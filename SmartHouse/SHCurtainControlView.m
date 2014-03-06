@@ -16,7 +16,9 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
+        self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
+        //self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
+        skip = NO;
     }
     return self;
 }
@@ -29,7 +31,7 @@
         //self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
         self.controller = controller;
         [self setBackgroundColor:[UIColor clearColor]];
-
+        self.model = model;
         self.CurtainImage = [[UIImageView alloc] initWithFrame:CGRectMake(53.0, 130.0, 494.0, 258.0)];
         [self.CurtainImage setImage:[UIImage imageNamed:@"curtain_closed"]];
         [self addSubview:self.CurtainImage];
@@ -38,14 +40,13 @@
         [titleLabel setText:model.name];
         [titleLabel setFont:[UIFont boldSystemFontOfSize:16.0f]];
         [titleLabel setTextColor:[UIColor whiteColor]];
-        [titleLabel setBackgroundColor:[UIColor greenColor]];
-        [titleLabel sizeToFit];
-        [titleLabel setFrame:CGRectMake((frame.size.width - titleLabel.frame.size.width)/2, 31.0, titleLabel.frame.size.width, titleLabel.frame.size.height)];
+        [titleLabel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"title_bg"]]];
+        [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
         
         self.onButton = [[UIButton alloc] initWithFrame:CGRectMake(173.5, 380.0, 71.0, 48.0)];
         [self.onButton setImage:[UIImage imageNamed:@"btn_curtain_open_normal"] forState:UIControlStateNormal];
-        [self.onButton setImage:[UIImage imageNamed:@"btn_curtain_close_pressed"] forState:UIControlStateHighlighted];
+        [self.onButton setImage:[UIImage imageNamed:@"btn_curtain_open_pressed"] forState:UIControlStateHighlighted];
         [self.onButton addTarget:self action:@selector(onOnButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.onButton];
         
@@ -67,18 +68,53 @@
 
 - (void)onOnButtonClick:(UIButton *)sender
 {
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+        NSError *error;
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.opencmd];
+        [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+    });
 }
 
 - (void)onOffButtonClick:(UIButton *)sender
 {
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+        NSError *error;
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.closecmd];
+        [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+    });
 }
 
 - (void)onStopButtonClick:(UIButton *)sender
 {
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+        NSError *error;
+        GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
+        socket.command = [NSString stringWithFormat:@"%@\r\n", self.model.stopcmd];
+        [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+    });
 }
+
+/*
+- (void)queryMode:(NSThread *)thread
+{
+    while ([[NSThread currentThread] isCancelled] == NO) {
+        if (!skip) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+                NSError *error;
+                GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+                socket.command = [NSString stringWithFormat:@"aircreply %@,%@\r\n", self.model.channel, self.model.area];
+                [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+            });
+        } else {
+            skip = NO;
+        }
+        sleep(4);
+    }
+    [NSThread exit];
+}
+*/
 
 /*
 // Only override drawRect: if you perform custom drawing.

@@ -47,13 +47,15 @@
     self.detailBackground = [[UIImageView alloc] init];
     
     self.NetStateButton = [[UIButton alloc] init];
-    [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_2"] forState:UIControlStateNormal];
     NSString *string = [[NSUserDefaults standardUserDefaults] objectForKey:@"network"];
+    [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_2"] forState:UIControlStateNormal];
     self.insideNetAddr = YES;
+    self.myAppDelegate.host = self.myAppDelegate.host1;
     if (string) {
         if ([string isEqualToString:self.myAppDelegate.host2]) {
             [self.NetStateButton setImage:[UIImage imageNamed:@"btn_switch_1"] forState:UIControlStateNormal];
             self.insideNetAddr = NO;
+            self.myAppDelegate.host = self.myAppDelegate.host2;
         }
     }
     [self.NetStateButton addTarget:self action:@selector(onNetStateButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -360,6 +362,7 @@
         }
     } else if (type == TYPE_MODE) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
+            [self.detailView setContentSize:CGSizeMake(844.0, 553.0)];
             for (int i = 0; i < self.currentModel.modes.count; i++) {
                 UIButton *button = [[UIButton alloc] init];
                 [button setFrame:CGRectMake(76.0 + 246.0 * (i % 3), 75.0 + 124.0 * (i / 3), 200.0, 74.0)];
@@ -473,6 +476,9 @@
         [self.ModeButton setHidden:YES];
         [self.CurtainButton setHidden:YES];
         [self.AirButton setHidden:YES];
+        if (firstImageView) {
+            [firstImageView setImage:[UIImage imageNamed:@"icon_house_selected"]];
+        }
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)){
             [self.detailView setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];
@@ -482,6 +488,9 @@
         }
     } else {
         type = [self checkCurrentTypeState:currentModel];
+        if (firstImageView) {
+            [firstImageView setImage:[UIImage imageNamed:@"icon_house_normal"]];
+        }
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)){
             [self.detailView setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
@@ -525,7 +534,8 @@
     [cell.textLabel setTextColor:[UIColor colorWithRed:0.827 green:0.827 blue:0.827 alpha:1.0]];
     [cell.textLabel setHighlightedTextColor:[UIColor yellowColor]];
     if (indexPath.row == 0) {
-        [cell.imageView setImage:[UIImage imageNamed:@"selected"]];
+        firstImageView = cell.imageView;
+        [cell.imageView setImage:[UIImage imageNamed:@"icon_house_selected"]];
         [tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
     }
     return cell;
