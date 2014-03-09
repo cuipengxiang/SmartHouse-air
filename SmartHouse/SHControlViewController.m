@@ -285,6 +285,7 @@
 
 - (void)setupDetailView:(SHRoomModel *)currentModel Type:(int)type AtIndex:(int)index
 {
+    self.detailViews = [[NSMutableArray alloc] init];
     self.currentType = type;
     for (UIView *view in self.detailView.subviews) {
         [view removeFromSuperview];
@@ -342,6 +343,10 @@
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < self.currentModel.lights.count; i++) {
                 SHLightControlView *lightView = [[SHLightControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andModel:[self.currentModel.lights objectAtIndex:i] andController:self];
+                [self.detailViews addObject:lightView];
+                if (i == 0) {
+                    lightView.query = YES;
+                }
                 [self.detailView addSubview:lightView];
             }
         }
@@ -358,6 +363,10 @@
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < self.currentModel.airconditionings.count; i++) {
                 SHAirControlView *detailViewPanel = [[SHAirControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 25.0, 383, 500) andModel:[self.currentModel.airconditionings objectAtIndex:i] andController:self];
+                [self.detailViews addObject:detailViewPanel];
+                if (i == 0) {
+                    detailViewPanel.query = YES;
+                }
                 [self.detailView addSubview:detailViewPanel];
             }
         }
@@ -467,7 +476,7 @@
             GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
             socket.type = TYPE_AIR;
             socket.data = airmodel;
-            socket.command = [NSString stringWithFormat:@"aircreply %@,%@\r\n", [airmodel mainaddr], [airmodel secondaryaddr]];
+            socket.command = [NSString stringWithFormat:@"*aircreply %@,%@\r\n", [airmodel mainaddr], [airmodel secondaryaddr]];
             [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
         });
     }
@@ -510,10 +519,17 @@
     [[NSUserDefaults standardUserDefaults] setObject:self.myAppDelegate.host forKey:@"network"];
 }
 
+- (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage
+{
+    [[self.detailViews objectAtIndex:currentViewPage] setQuery:NO];
+    [[self.detailViews objectAtIndex:newViewPage] setQuery:YES];
+}
+
 - (void)onLeftButtonClick:(UIButton *)sender
 {
     self.currentDetailPage = self.detailView.contentOffset.x/844.0;
     if (self.currentDetailPage > 0) {
+        [self setCurrentViewQuery:self.currentDetailPage NewPage:self.currentDetailPage - 1];
         CGPoint point = CGPointMake((self.currentDetailPage - 1) * 844.0, self.detailView.contentOffset.y);
         [self.detailView setContentOffset:point animated:YES];
         
@@ -534,6 +550,7 @@
         self.currentDetailPage = self.detailView.contentOffset.x/844.0;
     }
     if (self.currentDetailPage < self.detailPageCount - 1) {
+        [self setCurrentViewQuery:self.currentDetailPage NewPage:self.currentDetailPage + 1];
         CGPoint point = CGPointMake((self.currentDetailPage + 1) * 844.0, self.detailView.contentOffset.y);
         [self.detailView setContentOffset:point animated:YES];
         
@@ -628,10 +645,18 @@
 	return 1;
 }
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    self.scrollLastViewPage = scrollView.contentOffset.x/844.0;
+}
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     int currentPage = scrollView.contentOffset.x/844.0;
+    if (currentPage != self.scrollLastViewPage) {
+        [[self.detailViews objectAtIndex:self.scrollLastViewPage] setQuery:NO];
+        [[self.detailViews objectAtIndex:currentPage] setQuery:YES];
+    }
     for (int i = 0; i < self.detailPageCount; i++) {
         UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + i];
         [image setImage:[UIImage imageNamed:@"unselected"]];

@@ -48,6 +48,8 @@
 @property(nonatomic)int currentDetailPage;
 
 @property(nonatomic, strong)NSMutableArray *defineModeCmd;
+@property(nonatomic) int scrollLastViewPage;
+@property(nonatomic, strong)NSMutableArray *detailViews;
 
 - (void)setViewFramesForOrientation:(UIInterfaceOrientation)orientation AtIndex:(int)index;
 - (void)setupNavigationBar:(float)width;
@@ -75,5 +77,6 @@
 - (int)checkCurrentTypeState:(SHRoomModel *)model;
 - (void)queryMode:(NSThread *)thread;
 - (void)saveUserDefineMode;
+- (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage;
 
 @end

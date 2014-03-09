@@ -33,17 +33,9 @@
         [titleLabel setTextAlignment:NSTextAlignmentCenter];
         [titleLabel setFrame:CGRectMake((frame.size.width - 162.0)/2, 31.0, 162.0, 33.0)];
         [self addSubview:titleLabel];
-        
         self.socketQueue = dispatch_queue_create("socketQueue4", NULL);
-        self.isOnNow = 0;
-        NSString *savedtemp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
-        if (savedtemp) {
-            self.currentTemp = [savedtemp integerValue];
-        } else {
-            self.currentTemp = 20;
-        }
         skip = NO;
-        
+        self.query = NO;
         [self setDetailWithModel];
     }
     return self;
@@ -149,6 +141,12 @@
     [self.settingButton addTarget:self action:@selector(onSettingButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.settingButton];
     
+    NSString *on = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@on", self.model.mainaddr, self.model.secondaryaddr]];
+    NSString *temp = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
+    NSString *speed = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@speed", self.model.mainaddr, self.model.secondaryaddr]];
+    NSString *mode = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"air%@%@mode", self.model.mainaddr, self.model.secondaryaddr]];
+    [self setStateWithOn:on Mode:mode Speed:speed Temp:temp];
+    
     if (![self.myModeThread isExecuting]) {
         [self.myModeThread start];
     }
@@ -228,6 +226,9 @@
 {
     skip = YES;
     [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentTemp] forKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.isOnNow] forKey:[NSString stringWithFormat:@"air%@%@on", self.model.mainaddr, self.model.secondaryaddr]];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentMode] forKey:[NSString stringWithFormat:@"air%@%@mode", self.model.mainaddr, self.model.secondaryaddr]];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentSpeed] forKey:[NSString stringWithFormat:@"air%@%@speed", self.model.mainaddr, self.model.secondaryaddr]];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
         NSError *error;
         GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.controller delegateQueue:self.controller.socketQueue];
@@ -240,19 +241,66 @@
 - (void)queryMode:(NSThread *)thread
 {
     while ([[NSThread currentThread] isCancelled] == NO) {
-        if (!skip) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-                NSError *error;
-                GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-                socket.command = [NSString stringWithFormat:@"aircreply %@,%@\r\n", self.model.mainaddr, self.model.secondaryaddr];
-                [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
-            });
-        } else {
-            skip = NO;
+        if (self.query) {
+            if (!skip) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+                    NSError *error;
+                    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
+                    socket.command = [NSString stringWithFormat:@"*aircreply %@,%@\r\n", self.model.mainaddr, self.model.secondaryaddr];
+                    [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
+                });
+            } else {
+                skip = NO;
+            }
+            sleep(4);
         }
-        sleep(6);
     }
     [NSThread exit];
+}
+
+
+- (void)setStateWithOn:(NSString *)on Mode:(NSString *)mode Speed:(NSString *)speed Temp:(NSString *)temp
+{
+    int tag = 0;
+    if (on) {
+        self.isOnNow = [on integerValue];
+        if (self.isOnNow == 1) {
+            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_on"] forState:UIControlStateNormal];
+            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_on"] forState:UIControlStateSelected];
+        } else {
+            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateNormal];
+            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateSelected];
+        }
+    }
+    
+    if (speed) {
+        self.currentSpeed = [speed integerValue];
+        tag = self.currentSpeed + SPEED_BUTTON_BASE_TAG;
+        [(UIButton *)[speedPanel viewWithTag:tag] setSelected:YES];
+        for (int i = 0; i < 3; i++) {
+            if (tag != [[speedPanel viewWithTag:i + SPEED_BUTTON_BASE_TAG] tag]) {
+                [(UIButton *)[speedPanel viewWithTag:i + SPEED_BUTTON_BASE_TAG] setSelected:NO];
+            }
+        }
+    }
+    
+    if (mode) {
+        self.currentMode = [mode integerValue];
+        tag = self.currentMode + MODE_BUTTON_BASE_TAG;
+        [(UIButton *)[modePanel viewWithTag:tag] setSelected:YES];
+        for (int i = 0; i < self.model.modes.count; i++) {
+            int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]];
+            if (tag != buttonTag) {
+                [(UIButton *)[modePanel viewWithTag:buttonTag] setSelected:NO];
+            }
+        }
+    }
+    
+    if (temp) {
+        self.currentTemp = [temp integerValue];
+        [temp_big setText:[NSString stringWithFormat:@"%d", self.currentTemp]];
+    }
+    
 }
 
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
@@ -280,6 +328,7 @@
     NSArray *arrayTemp = [msg arrayOfCaptureComponentsMatchedByRegex:@"Temp\\[(.+?)\\]"];
     if ((arrayState)&&(arrayState.count > 0)) {
         self.isOnNow = [[[arrayState objectAtIndex:0] objectAtIndex:1] integerValue];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.isOnNow] forKey:[NSString stringWithFormat:@"air%@%@on", self.model.mainaddr, self.model.secondaryaddr]];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (self.isOnNow == 1) {
                 [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_on"] forState:UIControlStateNormal];
@@ -292,6 +341,7 @@
     }
     if ((arraySpeed)&&(arraySpeed.count > 0)) {
         self.currentSpeed = [[[arraySpeed objectAtIndex:0] objectAtIndex:1] integerValue];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentSpeed] forKey:[NSString stringWithFormat:@"air%@%@speed", self.model.mainaddr, self.model.secondaryaddr]];
         int tag = self.currentSpeed + SPEED_BUTTON_BASE_TAG;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [(UIButton *)[speedPanel viewWithTag:tag] setSelected:YES];
@@ -304,6 +354,7 @@
     }
     if ((arrayMode)&&(arrayMode.count > 0)) {
         self.currentMode = [[[arrayMode objectAtIndex:0] objectAtIndex:1] integerValue];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentMode] forKey:[NSString stringWithFormat:@"air%@%@mode", self.model.mainaddr, self.model.secondaryaddr]];
         int tag = self.currentMode + MODE_BUTTON_BASE_TAG;
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [(UIButton *)[modePanel viewWithTag:tag] setSelected:YES];
@@ -317,6 +368,7 @@
     }
     if ((arrayTemp)&&(arrayTemp.count > 0)) {
         self.currentTemp = [[[arrayTemp objectAtIndex:0] objectAtIndex:1] integerValue];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", self.currentTemp] forKey:[NSString stringWithFormat:@"air%@%@temp", self.model.mainaddr, self.model.secondaryaddr]];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [temp_big setText:[NSString stringWithFormat:@"%d", self.currentTemp]];
         });

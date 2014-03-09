@@ -19,7 +19,7 @@
     if (self) {
         self.socketQueue = dispatch_queue_create("socketQueue2", NULL);
         self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
-        skip = NO;
+        self.query = NO;
     }
     return self;
 }
@@ -74,7 +74,10 @@
             [self.BrightnessControl addSubview:imageView];
         }
         
-        [self setBrightnessDegree:0];
+        NSString *degree = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"light%@%@", model.channel, model.area]];
+        if (degree) {
+            [self setBrightnessDegree:[degree integerValue]];
+        }
         
         if (![self.myModeThread isExecuting]) {
             [self.myModeThread start];
@@ -111,6 +114,7 @@
             [degreeImageView setImage:[UIImage imageNamed:@"light_degree_empty"]];
         }
     }
+    [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d", degree] forKey:[NSString stringWithFormat:@"light%@%@", self.model.channel, self.model.area]];
     [self.BrightnessImage setImage:[UIImage imageNamed:[NSString stringWithFormat:@"lightball_lv%d", self.Brightness]]];
 }
 
@@ -148,15 +152,13 @@
 - (void)queryMode:(NSThread *)thread
 {
     while ([[NSThread currentThread] isCancelled] == NO) {
-        if (!skip) {
+        if (self.query) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
                 NSError *error;
                 GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
                 socket.command = [NSString stringWithFormat:@"*requestchannellevel %@,%@\r\n", self.model.channel, self.model.area];
                 [socket connectToHost:self.myDelegate.host onPort:self.myDelegate.port withTimeout:3.0 error:&error];
             });
-        } else {
-            skip = NO;
         }
         sleep(4);
     }

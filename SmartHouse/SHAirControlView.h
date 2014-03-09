@@ -43,6 +43,8 @@
 @property (nonatomic) int isOnNow;
 @property (nonatomic,strong)SHAirConditioningModel *model;
 
+@property (nonatomic) BOOL query;
+
 - (id)initWithFrame:(CGRect)frame andModel:(SHAirConditioningModel *)model andController:(SHControlViewController *)controller;
 - (void)setDetailWithModel;
 - (void)onSettingButtonClick:(UIButton *)button;
@@ -53,5 +55,6 @@
 - (void)onSpeedButtonClick:(UIButton *)button;
 - (int)checkMode:(NSString *)mode;
 - (void)queryMode:(NSThread *)thread;
+- (void)setStateWithOn:(NSString *)on Mode:(NSString *)mode Speed:(NSString *)speed Temp:(NSString *)temp;
 
 @end
