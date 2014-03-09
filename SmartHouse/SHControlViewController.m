@@ -671,6 +671,10 @@
             [self.detailView setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 128.0f, 844.0f, 600.0f)];
             [self.detailBackground setImage:[UIImage imageNamed:@"detail_bg_l_index0"]];
+            [self.ModeButton setHidden:YES];
+            [self.LightButton setHidden:YES];
+            [self.CurtainButton setHidden:YES];
+            [self.AirButton setHidden:YES];
         } else {
             [self.detailView setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 175.0f, 844.0f, 553.0f)];
@@ -688,6 +692,10 @@
             [self.detailView setFrame:CGRectMake(160.0f, 226.0f, 588.0f, 580.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 186.0f, 588.0f, 640.0f)];
             [self.detailBackground setImage:[UIImage imageNamed:@"detail_bg_p_index0"]];
+            [self.ModeButton setHidden:YES];
+            [self.LightButton setHidden:YES];
+            [self.CurtainButton setHidden:YES];
+            [self.AirButton setHidden:YES];
         } else {
             [self.detailView setFrame:CGRectMake(160.0f, 226.0f, 588.0f, 580.0f)];
             [self.detailBackground setFrame:CGRectMake(160.0f, 186.0f, 588.0f, 640.0f)];
