@@ -19,6 +19,7 @@
         self.socketQueue = dispatch_queue_create("socketQueue3", NULL);
         //self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
         skip = NO;
+        self.query = NO;
     }
     return self;
 }

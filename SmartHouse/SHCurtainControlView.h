@@ -28,6 +28,7 @@
 //@property (nonatomic, strong) NSThread *myModeThread;
 @property (nonatomic, strong) SHCurtainModel *model;
 @property (nonatomic)int state;
+@property (nonatomic) BOOL query;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHCurtainModel *)model andController:(SHControlViewController *)controller;
 - (void)onOnButtonClick:(UIButton *)sender;

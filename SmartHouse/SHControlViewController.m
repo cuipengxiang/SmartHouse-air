@@ -33,7 +33,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.myAppDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        self.myModeThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
         self.socketQueue = dispatch_queue_create("socketQueue1", NULL);
     }
     return self;
@@ -127,11 +126,6 @@
     [self.leftButton setHidden:YES];
     [self.rightButton setHidden:YES];
     
-    /*
-    if (![self.myModeThread isExecuting]) {
-        [self.myModeThread start];
-    }
-    */
 }
 
 - (int)checkCurrentTypeState:(SHRoomModel *)model
@@ -355,6 +349,7 @@
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < self.currentModel.curtains.count; i++) {
                 SHCurtainControlView *curtainView = [[SHCurtainControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andModel:[self.currentModel.curtains objectAtIndex:i] andController:self];
+                [self.detailViews addObject:curtainView];
                 [self.detailView addSubview:curtainView];
             }
         }
@@ -416,15 +411,14 @@
             });
         }
     } else {
-        NSMutableArray *modeDefine = [[NSUserDefaults standardUserDefaults] objectForKey:@"mode_user_define"];
+        NSMutableArray *modeDefine = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"mode_user_define%@", self.currentModel.roomid]];
         if (modeDefine) {
-            for (int i = 0; i < modeDefine.count; i++) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-                    NSError *error;
-                    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myAppDelegate delegateQueue:self.myAppDelegate.socketQueue];
-                    socket.command = [NSString stringWithFormat:@"%@\r\n", [modeDefine objectAtIndex:i]];
-                    [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
-                });
+            if (self.myModeSetThread) {
+                self.myModeSetThread = nil;
+            }
+            self.myModeSetThread = [[NSThread alloc] initWithTarget:self selector:@selector(setMode:) object:nil];
+            if (![self.myModeSetThread isExecuting]) {
+                [self.myModeSetThread start];
             }
         } else {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"自定模式提醒" message:@"您尚未录入自定模式，是否保存家电当前状态为自定模式？(长按此按钮将再次录入自定义模式)" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
@@ -443,20 +437,17 @@
 - (void)saveUserDefineMode
 {
     self.defineModeCmd = [[NSMutableArray alloc] init];
+    self.queryCmds = [[NSMutableArray alloc] init];
     for (int i = 0; i < self.currentModel.lights.count; i++) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-            SHLightModel *lightmodel = [self.currentModel.lights objectAtIndex:i];
-            NSError *error;
-            GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-            socket.type = TYPE_LIGHT;
-            socket.data = lightmodel;
-            socket.command = [NSString stringWithFormat:@"*requestchannellevel %@,%@\r\n", [lightmodel channel], [lightmodel area]];
-            [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
-        });
+        SHLightModel *lightmodel = [self.currentModel.lights objectAtIndex:i];
+        NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
+        [dictionary setObject:lightmodel forKey:@"data"];
+        [dictionary setObject:[NSString stringWithFormat:@"%d", TYPE_LIGHT] forKey:@"type"];
+        [dictionary setObject:[NSString stringWithFormat:@"*requestchannellevel %@,%@\r\n", [lightmodel channel], [lightmodel area]] forKey:@"command"];
+        [self.queryCmds addObject:dictionary];
     }
     for (int i = 0; i < self.currentModel.curtains.count; i++) {
-     
-        SHCurtainModel *curtainmodel = [self.currentModel.airconditionings objectAtIndex:i];
+        SHCurtainModel *curtainmodel = [self.currentModel.curtains objectAtIndex:i];
         NSString *stateString = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"curtain%@%@", curtainmodel.channel, curtainmodel.area]];
         if (stateString) {
             int state = [stateString integerValue];
@@ -470,16 +461,63 @@
         }
     }
     for (int i = 0; i < self.currentModel.airconditionings.count; i++) {
+        SHAirConditioningModel *airmodel = [self.currentModel.airconditionings objectAtIndex:i];
+        NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
+        [dictionary setObject:airmodel forKey:@"data"];
+        [dictionary setObject:[NSString stringWithFormat:@"%d", TYPE_AIR] forKey:@"type"];
+        [dictionary setObject:[NSString stringWithFormat:@"*aircreply %@,%@\r\n", [airmodel mainaddr], [airmodel secondaryaddr]] forKey:@"command"];
+        [self.queryCmds addObject:dictionary];
+    }
+    
+    if (self.myModeQueryThread) {
+        self.myModeQueryThread = nil;
+    }
+    self.myModeQueryThread = [[NSThread alloc] initWithTarget:self selector:@selector(queryMode:) object:nil];
+    if (![self.myModeQueryThread isExecuting]) {
+        [self.myModeQueryThread start];
+    }
+}
+
+- (void)queryMode:(NSThread *)thread
+{
+    int i = 0;
+    while ([[NSThread currentThread] isCancelled] == NO) {
+        NSMutableDictionary *dictionary = [self.queryCmds objectAtIndex:i];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
-            SHAirConditioningModel *airmodel = [self.currentModel.airconditionings objectAtIndex:i];
             NSError *error;
             GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketQueue];
-            socket.type = TYPE_AIR;
-            socket.data = airmodel;
-            socket.command = [NSString stringWithFormat:@"*aircreply %@,%@\r\n", [airmodel mainaddr], [airmodel secondaryaddr]];
+            socket.command = [dictionary objectForKey:@"command"];
+            socket.type = [[dictionary objectForKey:@"type"] integerValue];
+            socket.data = [dictionary objectForKey:@"data"];
             [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
         });
+        [NSThread sleepForTimeInterval:0.5];
+        i = i + 1;
+        if (i == self.queryCmds.count) {
+            [self.myModeQueryThread cancel];
+        }
     }
+    [NSThread exit];
+}
+
+- (void)setMode:(NSThread *)thread
+{
+    int i = 0;
+    NSMutableArray *modeDefine = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"mode_user_define%@", self.currentModel.roomid]];
+    while ([[NSThread currentThread] isCancelled] == NO) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
+            NSError *error;
+            GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myAppDelegate delegateQueue:self.myAppDelegate.socketQueue];
+            socket.command = [NSString stringWithFormat:@"%@\r\n", [modeDefine objectAtIndex:i]];
+            [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
+        });
+        [NSThread sleepForTimeInterval:0.5];
+        i = i + 1;
+        if (i == modeDefine.count) {
+            [self.myModeSetThread cancel];
+        }
+    }
+    [NSThread exit];
 }
 
 - (void)onModeButtonLongPressed:(UILongPressGestureRecognizer *)gestureRecognizer
@@ -665,13 +703,6 @@
     [image setImage:[UIImage imageNamed:@"selected"]];
 }
 
-- (void)queryMode:(NSThread *)thread
-{
-    while (YES) {
-        
-    }
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
     if ((toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft)||(toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)) {
         return YES;
@@ -804,7 +835,7 @@
         [self.defineModeCmd addObject:[NSString stringWithFormat:@"*aircset %@,%@,%d,%d,%d,%d,%d", airmodel.mainaddr, airmodel.secondaryaddr, isOnNow, 0, speed, mode, temp]];
     }
     NSLog(@"%@", self.defineModeCmd);
-    [[NSUserDefaults standardUserDefaults] setObject:self.defineModeCmd forKey:@"mode_user_define"];
+    [[NSUserDefaults standardUserDefaults] setObject:self.defineModeCmd forKey:[NSString stringWithFormat:@"mode_user_define%@", self.currentModel.roomid]];
     [sock disconnect];
 }
 

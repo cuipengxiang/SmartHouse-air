@@ -20,7 +20,8 @@
 
 @property(nonatomic)dispatch_queue_t socketQueue;
 @property(nonatomic, strong)AppDelegate *myAppDelegate;
-@property(nonatomic, strong)NSThread *myModeThread;
+@property(nonatomic, strong)NSThread *myModeQueryThread;
+@property(nonatomic, strong)NSThread *myModeSetThread;
 @property(nonatomic, strong)UINavigationBar *navigationBar;
 @property(nonatomic, strong)UITableView *tableView;
 @property(nonatomic, strong)UIButton *ModeButton;
@@ -37,7 +38,7 @@
 @property(nonatomic, strong)UIBarButtonItem *networkBarButton;
 @property(nonatomic, strong)UINavigationItem *item;
 @property(nonatomic)BOOL insideNetAddr;
-
+@property(nonatomic, strong)NSMutableArray *queryCmds;
 @property(nonatomic)int currentType;
 
 @property(nonatomic, retain)SHLoginViewController *backController;
@@ -76,6 +77,7 @@
 
 - (int)checkCurrentTypeState:(SHRoomModel *)model;
 - (void)queryMode:(NSThread *)thread;
+- (void)setMode:(NSThread *)thread;
 - (void)saveUserDefineMode;
 - (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage;
 
