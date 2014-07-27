@@ -14,6 +14,7 @@
 #import "SHSettingsViewController.h"
 #import "SHAirControlView.h"
 #import "RegexKitLite.h"
+#import "SHDetailView.h"
 
 #define GUIDE_PANEL_BASE_TAG 2000
 #define MODE_BTN_BASE_TAG 1000
@@ -34,6 +35,10 @@
     if (self) {
         self.myAppDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         self.socketQueue = dispatch_queue_create("socketQueue1", NULL);
+        
+        Lights = [[self.myAppDelegate.models objectAtIndex:0] lights];
+        Curtains = [[self.myAppDelegate.models objectAtIndex:0] curtains];
+        AirConditionings = [[self.myAppDelegate.models objectAtIndex:0] airconditionings];
     }
     return self;
 }
@@ -397,16 +402,63 @@
 
 }
 
+- (NSMutableArray *)contentToCommamd:(NSArray *)contents
+{
+    NSMutableArray *commands = [[NSMutableArray alloc] init];
+    for (int i = 0; i < contents.count; i++) {
+        NSString *content = [contents objectAtIndex:i];
+        NSString *modelID = [[content componentsSeparatedByString:@","] objectAtIndex:0];
+        if ([[content substringToIndex:1] isEqualToString:@"L"]) {
+            for (int j = 0; j < Lights.count; j++) {
+                SHLightModel *light = [Lights objectAtIndex:j];
+                if ([[light deviceid] isEqualToString:modelID]) {
+                    int brightness = [[[content componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
+                    NSString *command = [NSString stringWithFormat:@"*channellevel %@,%d,%@,%@", light.channel, brightness, light.area, light.fade];
+                    [commands addObject:command];
+                }
+            }
+        } else if ([[content substringToIndex:1] isEqualToString:@"C"]) {
+            for (int j = 0; j < Curtains.count; j++) {
+                SHCurtainModel *curtain = [Curtains objectAtIndex:j];
+                if ([[curtain deviceid] isEqualToString:modelID]) {
+                    int open = [[[content componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
+                    NSString *command = [[NSString alloc] init];
+                    if (open == 0) {
+                        command = curtain.closecmd;
+                    } else if (open == 1) {
+                        command = curtain.opencmd;
+                    }
+                    [commands addObject:command];
+                }
+            }
+        } else if ([[content substringToIndex:1] isEqualToString:@"A"]) {
+            for (int j = 0; j < AirConditionings.count; j++) {
+                SHAirConditioningModel *airconditioning = [AirConditionings objectAtIndex:j];
+                if ([[airconditioning deviceid] isEqualToString:modelID]) {
+                    int isOnNow = [[[content componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
+                    int speed = [[[content componentsSeparatedByString:@","] objectAtIndex:2] integerValue];
+                    int mode = [[[content componentsSeparatedByString:@","] objectAtIndex:3] integerValue];
+                    int temp = [[[content componentsSeparatedByString:@","] objectAtIndex:4] integerValue];
+                    NSString *command = [NSString stringWithFormat:@"*aircset %@,%@,%d,%d,%d,%d,%d", airconditioning.mainaddr, airconditioning.secondaryaddr, isOnNow, 0, speed, mode, temp];
+                    [commands addObject:command];
+                }
+            }
+        }
+    }
+    return commands;
+}
+
 - (void)onModeButtonClick:(UIButton *)sender
 {
     if (sender.tag < self.currentModel.modes.count + MODE_BTN_BASE_TAG) {
         SHModeModel *modeModel = [self.currentModel.modes objectAtIndex:sender.tag - MODE_BTN_BASE_TAG];
         NSArray *cmdarray = [modeModel.modecmd componentsSeparatedByString:@"|"];
-        for (int i = 0; i < cmdarray.count; i++) {
+        NSMutableArray *commands = [self contentToCommamd:cmdarray];
+        for (int i = 0; i < commands.count; i++) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^(void){
                 NSError *error;
                 GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:self.myAppDelegate delegateQueue:self.myAppDelegate.socketQueue];
-                socket.command = [NSString stringWithFormat:@"%@\r\n", [cmdarray objectAtIndex:i]];
+                socket.command = [NSString stringWithFormat:@"%@\r\n", [commands objectAtIndex:i]];
                 [socket connectToHost:self.myAppDelegate.host onPort:self.myAppDelegate.port withTimeout:3.0 error:&error];
             });
         }
@@ -559,8 +611,10 @@
 
 - (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage
 {
-    [[self.detailViews objectAtIndex:currentViewPage] setQuery:NO];
-    [[self.detailViews objectAtIndex:newViewPage] setQuery:YES];
+    
+        [(SHDetailView *)[self.detailViews objectAtIndex:currentViewPage] setQuery:NO];
+        [(SHDetailView *)[self.detailViews objectAtIndex:newViewPage] setQuery:YES];
+    
 }
 
 - (void)onLeftButtonClick:(UIButton *)sender
@@ -692,8 +746,8 @@
 {
     int currentPage = scrollView.contentOffset.x/844.0;
     if (currentPage != self.scrollLastViewPage) {
-        [[self.detailViews objectAtIndex:self.scrollLastViewPage] setQuery:NO];
-        [[self.detailViews objectAtIndex:currentPage] setQuery:YES];
+        [(SHDetailView *)[self.detailViews objectAtIndex:self.scrollLastViewPage] setQuery:NO];
+        [(SHDetailView *)[self.detailViews objectAtIndex:currentPage] setQuery:YES];
     }
     for (int i = 0; i < self.detailPageCount; i++) {
         UIImageView *image = (UIImageView *)[self.GuidePanel viewWithTag:GUIDE_PANEL_BASE_TAG + i];

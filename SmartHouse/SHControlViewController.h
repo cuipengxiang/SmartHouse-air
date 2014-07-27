@@ -16,6 +16,10 @@
 
 {
     UIImageView *firstImageView;
+    
+    NSArray *Lights;
+    NSArray *Curtains;
+    NSArray *AirConditionings;
 }
 
 @property(nonatomic)dispatch_queue_t socketQueue;
@@ -80,5 +84,7 @@
 - (void)setMode:(NSThread *)thread;
 - (void)saveUserDefineMode;
 - (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage;
+
+- (NSMutableArray *)contentToCommamd:(NSArray *)contents;
 
 @end

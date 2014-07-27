@@ -11,8 +11,9 @@
 #import "AppDelegate.h"
 #import "SHControlViewController.h"
 #import "SHLightModel.h"
+#import "SHDetailView.h"
 
-@interface SHLightControlView : UIView<GCDAsyncSocketDelegate>
+@interface SHLightControlView : SHDetailView<GCDAsyncSocketDelegate>
 
 @property (nonatomic, strong) SHControlViewController *controller;
 @property (nonatomic) dispatch_queue_t socketQueue;
@@ -27,8 +28,6 @@
 @property (nonatomic, strong) UIImageView *BrightnessImage;
 @property (nonatomic, strong) NSThread *myModeThread;
 @property (nonatomic, strong) SHLightModel *model;
-
-@property (nonatomic) BOOL query;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHLightModel *)model andController:(SHControlViewController *)controller;
 - (void)onSwitchButtonClick:(UIButton *)sender;

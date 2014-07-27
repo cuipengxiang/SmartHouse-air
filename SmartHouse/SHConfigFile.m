@@ -57,7 +57,7 @@
         modeModel.area = [[modeElement attributes] objectForKey:@"area"];
         [wholeHouse.modes addObject:modeModel];
     }
-    [myDelegate.models addObject:wholeHouse];
+    
     
     NSArray *rooms = [hpple searchWithXPathQuery:@"//Room"];
     for (int i = 0; i < rooms.count; i++) {
@@ -120,6 +120,7 @@
         
         [myDelegate.models addObject:roomModel];
     }
+    [myDelegate.models insertObject:wholeHouse atIndex:0];
 }
 
 @end

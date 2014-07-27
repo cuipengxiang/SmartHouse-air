@@ -11,8 +11,9 @@
 #import "SHControlViewController.h"
 #import "GCDAsyncSocket.h"
 #import "SHAirConditioningModel.h"
+#import "SHDetailView.h"
 
-@interface SHAirControlView : UIView<GCDAsyncSocketDelegate>
+@interface SHAirControlView : SHDetailView<GCDAsyncSocketDelegate>
 {
     UIView *modePanel;
     UIView *speedPanel;
@@ -42,8 +43,6 @@
 @property (nonatomic) int currentTemp;
 @property (nonatomic) int isOnNow;
 @property (nonatomic,strong)SHAirConditioningModel *model;
-
-@property (nonatomic) BOOL query;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHAirConditioningModel *)model andController:(SHControlViewController *)controller;
 - (void)setDetailWithModel;

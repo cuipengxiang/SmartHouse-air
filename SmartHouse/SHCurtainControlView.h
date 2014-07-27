@@ -11,8 +11,9 @@
 #import "AppDelegate.h"
 #import "SHControlViewController.h"
 #import "SHCurtainModel.h"
+#import "SHDetailView.h"
 
-@interface SHCurtainControlView : UIView<GCDAsyncSocketDelegate>
+@interface SHCurtainControlView : SHDetailView<GCDAsyncSocketDelegate>
 {
     BOOL skip;
 }
@@ -28,7 +29,6 @@
 //@property (nonatomic, strong) NSThread *myModeThread;
 @property (nonatomic, strong) SHCurtainModel *model;
 @property (nonatomic)int state;
-@property (nonatomic) BOOL query;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHCurtainModel *)model andController:(SHControlViewController *)controller;
 - (void)onOnButtonClick:(UIButton *)sender;
