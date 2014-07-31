@@ -11,7 +11,7 @@
 		520B248B18BF6F6A00380C18 /* detail_bg_l_index0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 520B248718BF6F6A00380C18 /* detail_bg_l_index0@2x.png */; };
 		520B248C18BF6F6A00380C18 /* detail_bg_p_index0.png in Resources */ = {isa = PBXBuildFile; fileRef = 520B248818BF6F6A00380C18 /* detail_bg_p_index0.png */; };
 		520B248D18BF6F6A00380C18 /* detail_bg_p_index0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 520B248918BF6F6A00380C18 /* detail_bg_p_index0@2x.png */; };
-		520DC77118C70FE800CA8C21 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 520DC77018C70FE800CA8C21 /* libxml2.2.dylib */; };
+		520DC77118C70FE800CA8C21 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 520DC77018C70FE800CA8C21 /* libxml2.2.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
 		520DC77418C759B600CA8C21 /* SHLightModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 520DC77318C759B600CA8C21 /* SHLightModel.m */; };
 		520DC77718C759F700CA8C21 /* SHCurtainModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 520DC77618C759F700CA8C21 /* SHCurtainModel.m */; };
 		520DC77A18C75A2200CA8C21 /* SHAirConditioningModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 520DC77918C75A2200CA8C21 /* SHAirConditioningModel.m */; };
@@ -1091,7 +1091,7 @@
 				ORGANIZATIONNAME = Roc;
 				TargetAttributes = {
 					D8421CFA17BA853500C39DA0 = {
-						DevelopmentTeam = 5BA6RP6GDL;
+						DevelopmentTeam = KX9NH6X8K8;
 					};
 				};
 			};
@@ -1510,7 +1510,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "SmartHouse-Air";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "A44E8F35-1E8A-4066-9CCF-30F4A58D94BC";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;
@@ -1530,7 +1530,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "SmartHouse-Air";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "A44E8F35-1E8A-4066-9CCF-30F4A58D94BC";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
 				WRAPPER_EXTENSION = app;
