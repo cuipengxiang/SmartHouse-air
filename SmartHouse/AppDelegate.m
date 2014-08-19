@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "SHLoginViewController.h"
 #import "SHControlViewController.h"
 #import "SHConfigFile.h"
 
@@ -19,7 +18,7 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    self.viewController = [[SHLoginViewController alloc] initWithNibName:nil bundle:nil];
+    self.viewController = [[SHActiveViewController alloc] initWithNibName:nil bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     SHConfigFile *file = [[SHConfigFile alloc] init];

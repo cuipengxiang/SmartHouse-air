@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SHActiveViewController.h"
 #import "SHLoginViewController.h"
 #import "GCDAsyncSocket.h"
 
@@ -20,6 +21,6 @@
 @property (nonatomic)int16_t port;
 @property (strong, nonatomic) NSMutableArray *models;
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) SHLoginViewController *viewController;
+@property (strong, nonatomic) SHActiveViewController *viewController;
 
 @end

@@ -97,12 +97,12 @@
     [tempPanel setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"air_panel_temp_bg"]]];
     self.tempLower = [[UIButton alloc] initWithFrame:CGRectMake(0.0, 2.0, 75.0, 70.0)];
     [self.tempLower setBackgroundImage:[UIImage imageNamed:@"btn_lower_normal"] forState:UIControlStateNormal];
-    [self.tempLower setBackgroundImage:[UIImage imageNamed:@"btn_lower_pressed"] forState:UIControlStateNormal];
+    [self.tempLower setBackgroundImage:[UIImage imageNamed:@"btn_lower_pressed"] forState:UIControlStateHighlighted];
     [self.tempLower addTarget:self action:@selector(onLowerButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [tempPanel addSubview:self.tempLower];
     self.tempHigher = [[UIButton alloc] initWithFrame:CGRectMake(250.0, 2.0, 75.0, 70.0)];
     [self.tempHigher setBackgroundImage:[UIImage imageNamed:@"btn_higher_normal"] forState:UIControlStateNormal];
-    [self.tempHigher setBackgroundImage:[UIImage imageNamed:@"btn_higher_pressed"] forState:UIControlStateNormal];
+    [self.tempHigher setBackgroundImage:[UIImage imageNamed:@"btn_higher_pressed"] forState:UIControlStateHighlighted];
     [self.tempHigher addTarget:self action:@selector(onHigherButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [tempPanel addSubview:self.tempHigher];
     label_indoor = [[UILabel alloc] initWithFrame:CGRectMake(78.0, 10.0, 35.0, 15.0)];
@@ -266,10 +266,8 @@
         self.isOnNow = [on integerValue];
         if (self.isOnNow == 1) {
             [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_on"] forState:UIControlStateNormal];
-            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_on"] forState:UIControlStateSelected];
         } else {
             [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateNormal];
-            [self.open_close setBackgroundImage:[UIImage imageNamed:@"btn_switch_off"] forState:UIControlStateSelected];
         }
     }
     
@@ -289,7 +287,7 @@
         tag = self.currentMode + MODE_BUTTON_BASE_TAG;
         [(UIButton *)[modePanel viewWithTag:tag] setSelected:YES];
         for (int i = 0; i < self.model.modes.count; i++) {
-            int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]];
+            int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]] + MODE_BUTTON_BASE_TAG;
             if (tag != buttonTag) {
                 [(UIButton *)[modePanel viewWithTag:buttonTag] setSelected:NO];
             }
@@ -346,7 +344,7 @@
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [(UIButton *)[speedPanel viewWithTag:tag] setSelected:YES];
             for (int i = 0; i < 3; i++) {
-                if (tag != [[speedPanel viewWithTag:i + SPEED_BUTTON_BASE_TAG] tag]) {
+                if (tag != i + SPEED_BUTTON_BASE_TAG) {
                     [(UIButton *)[speedPanel viewWithTag:i + SPEED_BUTTON_BASE_TAG] setSelected:NO];
                 }
             }
@@ -359,7 +357,7 @@
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [(UIButton *)[modePanel viewWithTag:tag] setSelected:YES];
             for (int i = 0; i < self.model.modes.count; i++) {
-                int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]];
+                int buttonTag = [self checkMode:[self.model.modes objectAtIndex:i]] + MODE_BUTTON_BASE_TAG;
                 if (tag != buttonTag) {
                     [(UIButton *)[modePanel viewWithTag:buttonTag] setSelected:NO];
                 }

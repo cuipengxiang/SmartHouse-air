@@ -18,10 +18,16 @@
     BOOL skip;
 }
 
-@property (nonatomic)dispatch_queue_t socketQueue;
-@property (nonatomic,strong)AppDelegate *myDelegate;
-@property (nonatomic,retain)SHControlViewController *controller;
-@property (nonatomic,strong)SHMusicModel *model;
+@property (nonatomic, strong) SHControlViewController *controller;
+@property (nonatomic) dispatch_queue_t socketQueue;
+@property (nonatomic, strong) AppDelegate *myDelegate;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UIButton *playButton;
+@property (nonatomic, strong) UIButton *pauseButton;
+@property (nonatomic, strong) UIButton *volAddButton;
+@property (nonatomic, strong) UIButton *volSubButton;
+@property (nonatomic, strong) NSMutableArray *controlButtons;
+@property (nonatomic,strong) SHMusicModel *model;
 
 - (id)initWithFrame:(CGRect)frame andModel:(SHMusicModel *)model andController:(SHControlViewController *)controller;
 - (void)setDetailWithModel;

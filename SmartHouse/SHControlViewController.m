@@ -70,27 +70,22 @@
     
     self.ModeButton = [[UIButton alloc] init];
     [self.ModeButton setBackgroundImage:[UIImage imageNamed:@"btn_mode"] forState:UIControlStateNormal];
-    [self.ModeButton setBackgroundImage:[UIImage imageNamed:@"btn_mode"] forState:UIControlStateSelected];
     [self.ModeButton addTarget:self action:@selector(onModeClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.LightButton = [[UIButton alloc] init];
     [self.LightButton setBackgroundImage:[UIImage imageNamed:@"btn_light"] forState:UIControlStateNormal];
-    [self.LightButton setBackgroundImage:[UIImage imageNamed:@"btn_light"] forState:UIControlStateSelected];
     [self.LightButton addTarget:self action:@selector(onLightClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.CurtainButton = [[UIButton alloc] init];
     [self.CurtainButton setBackgroundImage:[UIImage imageNamed:@"btn_curtain"] forState:UIControlStateNormal];
-    [self.CurtainButton setBackgroundImage:[UIImage imageNamed:@"btn_curtain"] forState:UIControlStateSelected];
     [self.CurtainButton addTarget:self action:@selector(onCuitainClick:) forControlEvents:UIControlEventTouchUpInside];
 
     self.AirButton = [[UIButton alloc] init];
     [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_air"] forState:UIControlStateNormal];
-    [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_air"] forState:UIControlStateSelected];
     [self.AirButton addTarget:self action:@selector(onAirClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.MusicButton = [[UIButton alloc] init];
     [self.MusicButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateNormal];
-    [self.MusicButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateSelected];
     [self.MusicButton addTarget:self action:@selector(onMusicClick:) forControlEvents:UIControlEventTouchUpInside];
     
     self.leftButton = [[UIButton alloc] init];
@@ -358,9 +353,9 @@
             break;
         case TYPE_MUSIC:
             if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.AirButton.tag]]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.MusicButton.tag]]];
             } else {
-                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.AirButton.tag]]];
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.MusicButton.tag]]];
             }
             break;
     }
@@ -405,7 +400,7 @@
         [self setDetailViewScroll:self.currentModel.musics];
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             for (int i = 0; i < self.currentModel.musics.count; i++) {
-                SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 25.0, 383, 500) andModel:[self.currentModel.musics objectAtIndex:i] andController:self];
+                SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(844 * i + 122.0, 25.0, 600.0, 500.0) andModel:[self.currentModel.musics objectAtIndex:i] andController:self];
                 [self.detailViews addObject:detailViewPanel];
                 if (i == 0) {
                     detailViewPanel.query = YES;
