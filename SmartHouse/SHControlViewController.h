@@ -20,6 +20,7 @@
     NSArray *Lights;
     NSArray *Curtains;
     NSArray *AirConditionings;
+    NSArray *Musics;
 }
 
 @property(nonatomic)dispatch_queue_t socketQueue;
@@ -32,6 +33,7 @@
 @property(nonatomic, strong)UIButton *LightButton;
 @property(nonatomic, strong)UIButton *CurtainButton;
 @property(nonatomic, strong)UIButton *AirButton;
+@property(nonatomic, strong)UIButton *MusicButton;
 @property(nonatomic, strong)UIButton *NetStateButton;
 @property(nonatomic, strong)UIButton *leftButton;
 @property(nonatomic, strong)UIButton *rightButton;

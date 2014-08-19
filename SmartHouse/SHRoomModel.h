@@ -16,6 +16,7 @@
 @property (nonatomic,strong)NSMutableArray *lights;
 @property (nonatomic,strong)NSMutableArray *curtains;
 @property (nonatomic,strong)NSMutableArray *airconditionings;
+@property (nonatomic,strong)NSMutableArray *musics;
 
 - (id)init;
 

@@ -19,6 +19,7 @@
         self.lights = [[NSMutableArray alloc] init];
         self.curtains = [[NSMutableArray alloc] init];
         self.airconditionings = [[NSMutableArray alloc] init];
+        self.musics = [[NSMutableArray alloc] init];
     }
     return self;
 }

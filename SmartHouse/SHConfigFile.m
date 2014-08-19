@@ -13,6 +13,8 @@
 #import "SHLightModel.h"
 #import "SHCurtainModel.h"
 #import "SHAirConditioningModel.h"
+#import "SHMusicModel.h"
+#import "SHMusicButtonModel.h"
 
 @implementation SHConfigFile
     
@@ -116,6 +118,26 @@
             airconditioningModel.modes = [(NSString *)[[airconditioningElement attributes] objectForKey:@"modes"] componentsSeparatedByString:@"|"];
             [roomModel.airconditionings addObject:airconditioningModel];
             [wholeHouse.airconditionings addObject:airconditioningModel];
+        }
+        
+        NSArray *musics = [roomElement searchWithXPathQuery:@"//Music"];
+        for (int j = 0; j < musics.count; j++) {
+            SHMusicModel *musicModel = [[SHMusicModel alloc] init];
+            TFHppleElement *musicElement = [musics objectAtIndex:j];
+            musicModel.deviceid = [[musicElement attributes] objectForKey:@"id"];
+            musicModel.name = [[musicElement attributes] objectForKey:@"name"];
+            musicModel.area = [[musicElement attributes] objectForKey:@"area"];
+            musicModel.channel = [[musicElement attributes] objectForKey:@"channel"];
+            NSArray *musicButtons = [musicElement searchWithXPathQuery:@"//Button"];
+            for (int k = 0; k < musicButtons.count; k++) {
+                SHMusicButtonModel *buttonModel = [[SHMusicButtonModel alloc] init];
+                TFHppleElement *buttonElement = [musicButtons objectAtIndex:k];
+                buttonModel.name = [[buttonElement attributes] objectForKey:@"name"];
+                buttonModel.command = [[buttonElement attributes] objectForKey:@"cmd"];
+                [musicModel.buttons addObject:buttonModel];
+            }
+            [roomModel.musics addObject:musicModel];
+            [wholeHouse.musics addObject:musicModel];
         }
         
         [myDelegate.models addObject:roomModel];

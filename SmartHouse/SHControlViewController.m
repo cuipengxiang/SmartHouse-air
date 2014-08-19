@@ -13,6 +13,7 @@
 #import "SHCurtainControlView.h"
 #import "SHSettingsViewController.h"
 #import "SHAirControlView.h"
+#import "SHMusicControlView.h"
 #import "RegexKitLite.h"
 #import "SHDetailView.h"
 
@@ -21,6 +22,7 @@
 #define TYPE_LIGHT 1
 #define TYPE_CURTAIN 2
 #define TYPE_AIR 3
+#define TYPE_MUSIC 4
 #define TYPE_MODE 0
 
 @interface SHControlViewController ()
@@ -39,6 +41,7 @@
         Lights = [[self.myAppDelegate.models objectAtIndex:0] lights];
         Curtains = [[self.myAppDelegate.models objectAtIndex:0] curtains];
         AirConditionings = [[self.myAppDelegate.models objectAtIndex:0] airconditionings];
+        Musics = [[self.myAppDelegate.models objectAtIndex:0] musics];
     }
     return self;
 }
@@ -85,6 +88,11 @@
     [self.AirButton setBackgroundImage:[UIImage imageNamed:@"btn_air"] forState:UIControlStateSelected];
     [self.AirButton addTarget:self action:@selector(onAirClick:) forControlEvents:UIControlEventTouchUpInside];
     
+    self.MusicButton = [[UIButton alloc] init];
+    [self.MusicButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateNormal];
+    [self.MusicButton setBackgroundImage:[UIImage imageNamed:@"btn_music"] forState:UIControlStateSelected];
+    [self.MusicButton addTarget:self action:@selector(onMusicClick:) forControlEvents:UIControlEventTouchUpInside];
+    
     self.leftButton = [[UIButton alloc] init];
     [self.leftButton setBackgroundImage:[UIImage imageNamed:@"arrow_left"] forState:UIControlStateNormal];
     [self.leftButton addTarget:self action:@selector(onLeftButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -113,12 +121,14 @@
     [self.view addSubview:self.LightButton];
     [self.view addSubview:self.CurtainButton];
     [self.view addSubview:self.AirButton];
+    [self.view addSubview:self.MusicButton];
     [self.view addSubview:self.NetStateButton];
     
     [self.ModeButton setHidden:YES];
     [self.LightButton setHidden:YES];
     [self.CurtainButton setHidden:YES];
     [self.AirButton setHidden:YES];
+    [self.MusicButton setHidden:YES];
     
     [self setupDetailView:self.currentModel Type:TYPE_MODE AtIndex:0];
     
@@ -169,11 +179,21 @@
         [currentTypeState addObject:@"0"];
         [self.AirButton setHidden:YES];
         if (type == TYPE_AIR) {
-            type = -1;
+            type = TYPE_MUSIC;
         }
     } else {
         [currentTypeState addObject:@"1"];
         [self.AirButton setHidden:NO];
+    }
+    if ((!self.currentModel.musics)||(self.currentModel.musics.count == 0)) {
+        [currentTypeState addObject:@"0"];
+        [self.MusicButton setHidden:YES];
+        if (type == TYPE_MUSIC) {
+            type = -1;
+        }
+    } else {
+        [currentTypeState addObject:@"1"];
+        [self.MusicButton setHidden:NO];
     }
     
     if (!self.ModeButton.isHidden) {
@@ -191,6 +211,10 @@
     if (!self.AirButton.isHidden) {
         [self.AirButton setTag:[[currentTypeState objectAtIndex:0] integerValue] + [[currentTypeState objectAtIndex:1] integerValue] + [[currentTypeState objectAtIndex:2] integerValue]];
         [self.AirButton setFrame:CGRectMake(192.0f + 100.0 * self.AirButton.tag, 90.0f, 66.0f, 70.0f)];
+    }
+    if (!self.MusicButton.isHidden) {
+        [self.MusicButton setTag:[[currentTypeState objectAtIndex:0] integerValue] + [[currentTypeState objectAtIndex:1] integerValue] + [[currentTypeState objectAtIndex:2] integerValue] + [[currentTypeState objectAtIndex:3] integerValue]];
+        [self.MusicButton setFrame:CGRectMake(192.0f + 100.0 * self.MusicButton.tag, 90.0f, 66.0f, 70.0f)];
     }
     
     return type;
@@ -332,6 +356,13 @@
                 [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.AirButton.tag]]];
             }
             break;
+        case TYPE_MUSIC:
+            if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_l_%d", self.AirButton.tag]]];
+            } else {
+                [self.detailBackground setImage:[UIImage imageNamed:[NSString stringWithFormat:@"bg_detail_p_%d", self.AirButton.tag]]];
+            }
+            break;
     }
     [self.GuidePanel setHidden:YES];
     [self.leftButton setHidden:YES];
@@ -370,6 +401,18 @@
                 [self.detailView addSubview:detailViewPanel];
             }
         }
+    } else if (type == TYPE_MUSIC) {
+        [self setDetailViewScroll:self.currentModel.musics];
+        if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
+            for (int i = 0; i < self.currentModel.musics.count; i++) {
+                SHMusicControlView *detailViewPanel = [[SHMusicControlView alloc] initWithFrame:CGRectMake(844 * i + 230.5, 25.0, 383, 500) andModel:[self.currentModel.musics objectAtIndex:i] andController:self];
+                [self.detailViews addObject:detailViewPanel];
+                if (i == 0) {
+                    detailViewPanel.query = YES;
+                }
+                [self.detailView addSubview:detailViewPanel];
+            }
+        }
     } else if (type == TYPE_MODE) {
         if (UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
             [self.detailView setContentSize:CGSizeMake(844.0, 553.0)];
@@ -395,11 +438,8 @@
                 [button addTarget:self action:@selector(onModeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
                 [self.detailView addSubview:button];
             }
-        } else {
-            
         }
     }
-
 }
 
 - (NSMutableArray *)contentToCommamd:(NSArray *)contents
@@ -600,6 +640,11 @@
     [self setupDetailView:self.currentModel Type:TYPE_AIR AtIndex:self.tableView.indexPathForSelectedRow.row];
 }
 
+- (void)onMusicClick:(id)sender
+{
+    [self setupDetailView:self.currentModel Type:TYPE_MUSIC AtIndex:self.tableView.indexPathForSelectedRow.row];
+}
+
 - (void)onNetStateButtonClick:(id)sender
 {
     self.insideNetAddr = !self.insideNetAddr;
@@ -611,10 +656,8 @@
 
 - (void)setCurrentViewQuery:(int)currentViewPage NewPage:(int)newViewPage
 {
-    
-        [(SHDetailView *)[self.detailViews objectAtIndex:currentViewPage] setQuery:NO];
-        [(SHDetailView *)[self.detailViews objectAtIndex:newViewPage] setQuery:YES];
-    
+    [(SHDetailView *)[self.detailViews objectAtIndex:currentViewPage] setQuery:NO];
+    [(SHDetailView *)[self.detailViews objectAtIndex:newViewPage] setQuery:YES];
 }
 
 - (void)onLeftButtonClick:(UIButton *)sender
@@ -663,6 +706,7 @@
         [self.ModeButton setHidden:YES];
         [self.CurtainButton setHidden:YES];
         [self.AirButton setHidden:YES];
+        [self.MusicButton setHidden:YES];
         if (firstImageView) {
             [firstImageView setImage:[UIImage imageNamed:@"icon_house_selected"]];
         }
