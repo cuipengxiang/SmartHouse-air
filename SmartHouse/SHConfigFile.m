@@ -33,10 +33,62 @@
     if (!myDelegate.models) {
         myDelegate.models = [[NSMutableArray alloc] init];
     }
+    
+    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    //    NSString *documentDirectory = [paths objectAtIndex:0];
+    //    NSString *file = [documentDirectory stringByAppendingPathComponent:@"test.xml"];
+    //    NSData *data = [NSData dataWithContentsOfFile:file];
+    
+    NSData *data = [[NSData alloc] init];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    
     NSString *documentDirectory = [paths objectAtIndex:0];
+    
     NSString *file = [documentDirectory stringByAppendingPathComponent:@"test.xml"];
-    NSData *data = [NSData dataWithContentsOfFile:file];
+    NSLog(@"%@", file);
+    data = [NSData dataWithContentsOfFile:file];
+    NSLog(@"%d", data.length);
+    
+    //    if (data.length >= 50) {
+    //
+    //    } else {
+    //        NSBundle *mainBundle = [NSBundle mainBundle];
+    //        NSString *path = [mainBundle pathForResource:@"test" ofType:@"xml"];
+    //
+    //        NSData *dataBundle = [NSData dataWithContentsOfFile:path];
+    //        data = dataBundle;
+    //    }
+    
+    
+    
+    
+    /*
+     没激活的情况下只从bundle里读
+     已激活的情况下如果document里面有就从document里面读 没有还是从bundle里读
+     */
+    
+    
+    
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"first"]) {
+        // 没激活的情况
+        NSBundle *mainBundle = [NSBundle mainBundle];
+        NSString *path = [mainBundle pathForResource:@"test" ofType:@"xml"];
+        
+        NSData *dataBundle = [NSData dataWithContentsOfFile:path];
+        data = dataBundle;
+    } else {
+        // 已激活的情况
+        
+        if (data.length >= 50) {
+            
+        } else {
+            NSBundle *mainBundle = [NSBundle mainBundle];
+            NSString *path = [mainBundle pathForResource:@"test" ofType:@"xml"];
+            
+            NSData *dataBundle = [NSData dataWithContentsOfFile:path];
+            data = dataBundle;
+        }
+    }
     
     TFHpple *hpple = [[TFHpple alloc] initWithXMLData:data encoding:@"utf-8"];
     NSArray *house = [hpple searchWithXPathQuery:@"//House"];
